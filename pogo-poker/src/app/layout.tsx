@@ -3,6 +3,8 @@ import { Bungee, Cormorant_Garamond, Hanken_Grotesk, JetBrains_Mono } from "next
 import "./globals.css";
 import { APP_NAME_FULL } from "@/components/brand";
 import { Providers } from "@/components/providers";
+import { LaunchGate } from "@/components/launch-gate";
+import { launchInitiallyLocked } from "@/lib/launch";
 
 // Design system type (from Claude Design): editorial serif display, clean sans
 // UI, mono for figures.
@@ -73,6 +75,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen">
         <Providers>{children}</Providers>
+        <LaunchGate initialLocked={launchInitiallyLocked()} />
       </body>
     </html>
   );
