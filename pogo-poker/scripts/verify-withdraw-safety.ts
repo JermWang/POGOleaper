@@ -13,9 +13,9 @@
 
 import { prisma } from "../src/lib/db/prisma";
 import { env } from "../src/lib/env";
-import { requestWithdrawal, rejectWithdrawal } from "../src/lib/solana/withdrawals";
+import { requestWithdrawal, rejectWithdrawal } from "../src/lib/chain/withdrawals";
 import { reconcileUserBalance } from "../src/lib/ledger/ledger";
-import { formatLamportsToSol } from "../src/lib/ledger/money";
+import { formatWeiToEth } from "../src/lib/ledger/money";
 
 function assert(cond: unknown, msg: string): asserts cond {
   if (!cond) throw new Error("ASSERT FAILED: " + msg);
@@ -45,10 +45,10 @@ async function main() {
   // start clean, then snapshot the starting balance.
   const cleared = await rejectAllNonTerminal(alice.id);
   if (cleared) console.log(`  (cleared ${cleared} non-terminal withdrawal(s) from a prior run)`);
-  const start = await reconcileUserBalance(alice.id, "SOL");
+  const start = await reconcileUserBalance(alice.id, "ETH");
   assert(start.ok, "alice's balance reconciles at start");
   assert(start.ledgerAvailable > 1_000_000_000n, "alice has enough available SOL to test");
-  console.log(`  start available: ${formatLamportsToSol(start.ledgerAvailable)} SOL\n`);
+  console.log(`  start available: ${formatWeiToEth(start.ledgerAvailable)} ETH\n`);
 
   const MAX = env.withdrawalDailyMaxCount;
   assert(MAX >= 2 && MAX <= 50, `velocity count cap is a sane test value (${MAX})`);
@@ -57,19 +57,19 @@ async function main() {
   //    pushed to manual review purely because of the count.
   let approved = 0;
   for (let i = 0; i < MAX; i++) {
-    const r = await requestWithdrawal({ userId: alice.id, asset: "SOL", amount: SMALL, toAddress: addr(i) });
+    const r = await requestWithdrawal({ userId: alice.id, asset: "ETH", amount: SMALL, toAddress: addr(i) });
     if (r.status === "APPROVED") approved++;
   }
   assert(approved === MAX, `first ${MAX} distinct small withdrawals auto-approved`);
 
-  const overflow = await requestWithdrawal({ userId: alice.id, asset: "SOL", amount: SMALL, toAddress: addr(MAX) });
+  const overflow = await requestWithdrawal({ userId: alice.id, asset: "ETH", amount: SMALL, toAddress: addr(MAX) });
   assert(overflow.status === "PENDING_REVIEW" && overflow.requiresReview, `withdrawal #${MAX + 1} forced to review by velocity`);
 
   // 2) Double-submit guard: an identical in-flight request (same asset/amount/
   //    address as #0, which is APPROVED) is refused.
   let dupRejected = false;
   try {
-    await requestWithdrawal({ userId: alice.id, asset: "SOL", amount: SMALL, toAddress: addr(0) });
+    await requestWithdrawal({ userId: alice.id, asset: "ETH", amount: SMALL, toAddress: addr(0) });
   } catch (e) {
     dupRejected = /already in progress/i.test(String(e instanceof Error ? e.message : e));
   }
@@ -79,7 +79,7 @@ async function main() {
   const rejected = await rejectAllNonTerminal(alice.id);
   assert(rejected === MAX + 1, `all ${MAX + 1} test withdrawals rejected (funds unlocked)`);
 
-  const end = await reconcileUserBalance(alice.id, "SOL");
+  const end = await reconcileUserBalance(alice.id, "ETH");
   assert(end.ok, "alice's balance reconciles after cleanup");
   assert(end.ledgerAvailable === start.ledgerAvailable, "available SOL fully restored to the starting amount");
 

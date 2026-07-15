@@ -46,14 +46,14 @@ Set the **ws** service variables (Settings → Variables), or via CLI
 DATABASE_URL=<the Supabase pooler URL from .env>
 NEXT_PUBLIC_PRIVY_APP_ID=cmq5rxao4006o0ck5sslq87nt
 PRIVY_APP_SECRET=<from .env>
-SOLANA_RPC_URL=<a real RPC, e.g. Helius/QuickNode for mainnet>
-SOLANA_NETWORK=mainnet-beta            # or devnet
+ROBINHOOD_RPC_URL=https://rpc.mainnet.chain.robinhood.com   # or a dedicated provider
+ROBINHOOD_CHAIN_ID=4663                # 46630 for testnet
 HOT_WALLET_PRIVATE_KEY=<base58 hot wallet secret>   # enables real withdrawals
 USDC_MINT=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-MIN_WITHDRAWAL_REVIEW_LAMPORTS=1000000000
+MIN_WITHDRAWAL_REVIEW_WEI=100000000000000000   # 0.1 ETH
 DEPOSIT_CONFIRMATIONS=32
 ENABLE_DEV_COMPLIANCE_APPROVAL=false   # MUST be false in production
-ADMIN_WALLETS=<your Solana wallet address>   # wallet-only login has no email
+ADMIN_WALLETS=<your 0x wallet address>       # wallet-only login has no email
 ```
 
 > The ws service start command must be `npm run ws:prod` (no `--env-file`;
@@ -75,7 +75,7 @@ Set the **web** service variables — same as ws, PLUS the ws URL (use `wss://`)
 NEXT_PUBLIC_WS_URL=wss://<ws-service-domain>
 ```
 
-…and all the same secrets (DATABASE_URL, Privy, Solana, ADMIN_WALLETS, etc.).
+…and all the same secrets (DATABASE_URL, Privy, Robinhood Chain RPC, ADMIN_WALLETS, etc.).
 `railway.json` already sets the web start command (`npm run start`) and
 healthcheck.
 
@@ -106,9 +106,9 @@ Seed (optional, dev data) is a one-off: `npx prisma db seed`.
   errors (`@stripe/crypto`, `@farcaster/*`, etc.).
 - **prisma generate** runs automatically via the `postinstall` script.
 - **Hot wallet**: until `HOT_WALLET_PRIVATE_KEY` is set, the app uses the mock
-  Solana provider (no real deposits/withdrawals). Setting it switches to the
-  real `Web3SolanaProvider`. Fund the hot wallet for withdrawals; use a real RPC
-  (the public `api.mainnet-beta.solana.com` is rate-limited).
+  chain provider (no real deposits/withdrawals). Setting it switches to the
+  real `EvmChainProvider`. Fund the hot wallet for withdrawals; use a reliable RPC
+  (the public Robinhood Chain RPC may be rate-limited under load).
 - **Admin access**: wallet-only login has no email, so set `ADMIN_WALLETS` to
   your wallet address to reach `/admin`.
 - See `PRODUCTION_TODO.md` for the remaining hardening (KMS signer, real KYC/geo

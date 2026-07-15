@@ -1,6 +1,6 @@
 /**
  * Pure poker engine types. No Next.js, no Prisma, no I/O.
- * All chip amounts are `bigint` (lamports or USDC base units — the engine is
+ * All chip amounts are `bigint` (wei or USDC base units — the engine is
  * unit-agnostic and just treats them as integers).
  */
 

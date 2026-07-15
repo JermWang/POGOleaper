@@ -46,3 +46,6 @@ Thumbs.db
 *.temp
 *.bak
 *~
+
+# Claude Design source bundle (already merged into the site)
+design_additions/

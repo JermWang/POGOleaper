@@ -19,8 +19,8 @@ Key facts:
 Confirm each var is set on the **correct** service.
 
 **`ws` service** (holds tables + on-chain workers):
-- [ ] `HOT_WALLET_PRIVATE_KEY` — set (flips Mock → real Web3 Solana provider)
-- [ ] `DATABASE_URL`, `SOLANA_RPC_URL` (Helius mainnet), `SOLANA_NETWORK=mainnet-beta`
+- [ ] `HOT_WALLET_PRIVATE_KEY` — set (flips Mock → real EVM chain provider)
+- [ ] `DATABASE_URL`, `ROBINHOOD_RPC_URL` (mainnet), `ROBINHOOD_CHAIN_ID=4663-beta`
 - [ ] `RUN_BACKGROUND_WORKERS` **unset or `true`** (so deposit/withdrawal/reconcile run)
 - [ ] `ALERT_WEBHOOK_URL` — set (see §2.1)
 
@@ -37,7 +37,7 @@ Confirm each var is set on the **correct** service.
 ### 1.2 Hot-wallet float + gas
 - [ ] Hot wallet funded with enough SOL to cover expected **payouts + its own tx fees**
 - [ ] If running USDC/token tables, hot wallet holds enough of that asset too
-- [ ] `MIN_WITHDRAWAL_REVIEW_LAMPORTS` and the daily caps
+- [ ] `MIN_WITHDRAWAL_REVIEW_WEI` and the daily caps
       (`WITHDRAWAL_DAILY_MAX_*`) match the float you'll auto-approve without a
       manual look. Anything at/above forces manual review — that's the safety valve.
 

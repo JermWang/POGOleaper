@@ -9,7 +9,7 @@ interface VerifyAnchor {
   status?: string;
   merkleRoot?: string;
   rootMatches?: boolean;
-  txSignature?: string | null;
+  txHash?: string | null;
   explorerUrl?: string | null;
   handCount?: number;
   confirmedAt?: string | null;
@@ -152,7 +152,7 @@ export function VerifyHandDrawer({ handId }: { handId: string | null }) {
                             rel="noopener noreferrer"
                             className="mt-0.5 inline-block break-all font-mono text-xs text-pogo-soft underline decoration-pogo-soft/40 underline-offset-2 hover:text-pogo"
                           >
-                            View on Solscan ↗
+                            View on Blockscout ↗
                           </a>
                         </div>
                       )}

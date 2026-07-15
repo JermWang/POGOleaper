@@ -15,7 +15,7 @@
 
 import { prisma } from "../src/lib/db/prisma";
 import { lockBuyIn, cashOutSeat, reconcileUserBalance } from "../src/lib/ledger/ledger";
-import { parseSolToLamports, formatLamportsToSol } from "../src/lib/ledger/money";
+import { parseEthToWei, formatWeiToEth } from "../src/lib/ledger/money";
 import { TableRoom } from "../src/lib/realtime/table-room";
 import { attachHandPersistence } from "../src/lib/realtime/persistence";
 import { verifyShuffleProof, ALGORITHM } from "../src/lib/poker/rng";
@@ -44,25 +44,25 @@ async function main() {
   // return any locked funds to available.
   await prisma.hand.deleteMany({ where: { tableId: table.id } });
   for (const u of [alice, bob]) {
-    const bal = await prisma.balance.findUnique({ where: { userId_asset: { userId: u.id, asset: "SOL" } } });
+    const bal = await prisma.balance.findUnique({ where: { userId_asset: { userId: u.id, asset: "ETH" } } });
     if (bal && bal.lockedAmount > 0n) {
-      await cashOutSeat({ userId: u.id, asset: "SOL", amount: bal.lockedAmount, tableId: table.id, correlationId: `verify-reset:${u.id}:${Date.now()}` });
+      await cashOutSeat({ userId: u.id, asset: "ETH", amount: bal.lockedAmount, tableId: table.id, correlationId: `verify-reset:${u.id}:${Date.now()}` });
     }
   }
 
   // Snapshot starting available balances.
-  const startAlice = await reconcileUserBalance(alice.id, "SOL");
-  const startBob = await reconcileUserBalance(bob.id, "SOL");
+  const startAlice = await reconcileUserBalance(alice.id, "ETH");
+  const startBob = await reconcileUserBalance(bob.id, "ETH");
   console.log(
-    `Start: alice ${formatLamportsToSol(startAlice.ledgerAvailable)} SOL, bob ${formatLamportsToSol(startBob.ledgerAvailable)} SOL\n`,
+    `Start: alice ${formatWeiToEth(startAlice.ledgerAvailable)} ETH, bob ${formatWeiToEth(startBob.ledgerAvailable)} ETH\n`,
   );
 
-  const buyIn = parseSolToLamports("1"); // 1 SOL each
+  const buyIn = parseEthToWei("1"); // 1 SOL each
 
   // 1) Lock buy-ins (available -> table-locked) exactly as the WS server does.
-  await lockBuyIn({ userId: alice.id, asset: "SOL", amount: buyIn, tableId: table.id, correlationId: `verify-buyin:${alice.id}:${Date.now()}` });
-  await lockBuyIn({ userId: bob.id, asset: "SOL", amount: buyIn, tableId: table.id, correlationId: `verify-buyin:${bob.id}:${Date.now()}` });
-  const lockedAlice = await reconcileUserBalance(alice.id, "SOL");
+  await lockBuyIn({ userId: alice.id, asset: "ETH", amount: buyIn, tableId: table.id, correlationId: `verify-buyin:${alice.id}:${Date.now()}` });
+  await lockBuyIn({ userId: bob.id, asset: "ETH", amount: buyIn, tableId: table.id, correlationId: `verify-buyin:${bob.id}:${Date.now()}` });
+  const lockedAlice = await reconcileUserBalance(alice.id, "ETH");
   assert(lockedAlice.ok && lockedAlice.cachedLocked >= buyIn, "buy-in locked alice's funds and reconciles");
 
   // 2) Build the room with production persistence wired to the real DB.
@@ -153,7 +153,7 @@ async function main() {
   });
   const lockedAfter: Record<string, bigint> = {};
   for (const u of [alice, bob]) {
-    const b = await prisma.balance.findUniqueOrThrow({ where: { userId_asset: { userId: u.id, asset: "SOL" } } });
+    const b = await prisma.balance.findUniqueOrThrow({ where: { userId_asset: { userId: u.id, asset: "ETH" } } });
     lockedAfter[u.id] = b.lockedAmount;
   }
   const totalLocked = lockedAfter[alice.id]! + lockedAfter[bob.id]!;
@@ -167,24 +167,24 @@ async function main() {
 
   // 6) Cash both players out (table-locked -> available) and reconcile.
   for (const u of [alice, bob]) {
-    const bal = await prisma.balance.findUniqueOrThrow({ where: { userId_asset: { userId: u.id, asset: "SOL" } } });
+    const bal = await prisma.balance.findUniqueOrThrow({ where: { userId_asset: { userId: u.id, asset: "ETH" } } });
     if (bal.lockedAmount > 0n) {
-      await cashOutSeat({ userId: u.id, asset: "SOL", amount: bal.lockedAmount, tableId: table.id, correlationId: `verify-cashout:${u.id}:${Date.now()}` });
+      await cashOutSeat({ userId: u.id, asset: "ETH", amount: bal.lockedAmount, tableId: table.id, correlationId: `verify-cashout:${u.id}:${Date.now()}` });
     }
   }
-  const endAlice = await reconcileUserBalance(alice.id, "SOL");
-  const endBob = await reconcileUserBalance(bob.id, "SOL");
+  const endAlice = await reconcileUserBalance(alice.id, "ETH");
+  const endBob = await reconcileUserBalance(bob.id, "ETH");
   assert(endAlice.ok, "alice's cached balance reconciles to the ledger");
   assert(endBob.ok, "bob's cached balance reconciles to the ledger");
   assert(endAlice.cachedLocked === 0n && endBob.cachedLocked === 0n, "no funds left locked after cash-out");
 
   const startTotal = startAlice.ledgerAvailable + startBob.ledgerAvailable;
   const endTotal = endAlice.ledgerAvailable + endBob.ledgerAvailable;
-  assert(startTotal === endTotal, `SOL conserved across the hand (${formatLamportsToSol(startTotal)} -> ${formatLamportsToSol(endTotal)})`);
+  assert(startTotal === endTotal, `ETH conserved across the hand (${formatWeiToEth(startTotal)} -> ${formatWeiToEth(endTotal)})`);
 
   const winner = hand.results.find((r) => r.amountWon > 0n);
-  console.log(`\nResult: ${winner ? `${winner.handDescription} won ${formatLamportsToSol(winner.amountWon)} SOL` : "split"}`);
-  console.log("End: alice", formatLamportsToSol(endAlice.ledgerAvailable), "SOL, bob", formatLamportsToSol(endBob.ledgerAvailable), "SOL");
+  console.log(`\nResult: ${winner ? `${winner.handDescription} won ${formatWeiToEth(winner.amountWon)} ETH` : "split"}`);
+  console.log("End: alice", formatWeiToEth(endAlice.ledgerAvailable), "SOL, bob", formatWeiToEth(endBob.ledgerAvailable), "ETH");
   console.log("\n✅ ALL CHECKS PASSED — end-to-end flow works against the live database.");
 }
 

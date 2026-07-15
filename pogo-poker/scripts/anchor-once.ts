@@ -6,13 +6,13 @@
 
 import { prisma } from "@/lib/db/prisma";
 import { runAnchorOnce, buildHandAnchorProof } from "@/lib/jobs/anchor";
-import { setSolanaProvider } from "@/lib/solana/connection";
-import { MockSolanaProvider } from "@/lib/solana/mock-provider";
+import { setChainProvider } from "@/lib/chain/connection";
+import { MockChainProvider } from "@/lib/chain/mock-provider";
 
 async function main() {
-  // Validate the proof pipeline without spending real fees — the on-chain memo
+  // Validate the proof pipeline without spending real fees — the on-chain calldata
   // post is exercised separately once the hot wallet is funded.
-  setSolanaProvider(new MockSolanaProvider());
+  setChainProvider(new MockChainProvider());
 
   const candidate = await prisma.hand.findFirst({
     where: { status: "COMPLETE", anchorId: null },
@@ -28,7 +28,7 @@ async function main() {
     console.log("proof.anchored:", p.anchored);
     console.log("proof.rootMatches:", p.rootMatches);
     console.log("proof.merkleRoot:", p.merkleRoot);
-    console.log("proof.txSignature:", p.txSignature);
+    console.log("proof.txHash:", p.txHash);
     console.log("proof steps:", p.proof?.length);
     if (!p.rootMatches) throw new Error("ROOT MISMATCH — proof does not verify");
     console.log("OK: hand verifies against the anchored root");

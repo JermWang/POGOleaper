@@ -13,7 +13,7 @@ import {
   reconcileUserBalance,
   claimReferralEarnings,
 } from "../src/lib/ledger/ledger";
-import { parseSolToLamports } from "../src/lib/ledger/money";
+import { parseEthToWei } from "../src/lib/ledger/money";
 import { TableRoom } from "../src/lib/realtime/table-room";
 import { attachHandPersistence } from "../src/lib/realtime/persistence";
 import { computeRake, splitRakeThreeWays } from "../src/lib/poker/rake";
@@ -49,16 +49,16 @@ async function main() {
   // Reset table + locked funds.
   await prisma.hand.deleteMany({ where: { tableId: table.id } });
   for (const u of [alice, bob]) {
-    const bal = await prisma.balance.findUnique({ where: { userId_asset: { userId: u.id, asset: "SOL" } } });
+    const bal = await prisma.balance.findUnique({ where: { userId_asset: { userId: u.id, asset: "ETH" } } });
     if (bal && bal.lockedAmount > 0n)
-      await cashOutSeat({ userId: u.id, asset: "SOL", amount: bal.lockedAmount, tableId: table.id, correlationId: `rake-reset:${u.id}:${Date.now()}` });
+      await cashOutSeat({ userId: u.id, asset: "ETH", amount: bal.lockedAmount, tableId: table.id, correlationId: `rake-reset:${u.id}:${Date.now()}` });
   }
 
-  const aliceRefBefore = (await prisma.balance.findUnique({ where: { userId_asset: { userId: alice.id, asset: "SOL" } } }))?.referralEarningsAmount ?? 0n;
+  const aliceRefBefore = (await prisma.balance.findUnique({ where: { userId_asset: { userId: alice.id, asset: "ETH" } } }))?.referralEarningsAmount ?? 0n;
 
-  const buyIn = parseSolToLamports("1");
-  await lockBuyIn({ userId: alice.id, asset: "SOL", amount: buyIn, tableId: table.id, correlationId: `rake-buyin:${alice.id}:${Date.now()}` });
-  await lockBuyIn({ userId: bob.id, asset: "SOL", amount: buyIn, tableId: table.id, correlationId: `rake-buyin:${bob.id}:${Date.now()}` });
+  const buyIn = parseEthToWei("1");
+  await lockBuyIn({ userId: alice.id, asset: "ETH", amount: buyIn, tableId: table.id, correlationId: `rake-buyin:${alice.id}:${Date.now()}` });
+  await lockBuyIn({ userId: bob.id, asset: "ETH", amount: buyIn, tableId: table.id, correlationId: `rake-buyin:${bob.id}:${Date.now()}` });
   const lockedBefore = buyIn * 2n;
 
   let handId = "";
@@ -113,30 +113,30 @@ async function main() {
   // bob contributed to the pot and is referred by alice, so alice earned a referral cut.
   assert(referral > 0n, `referral earnings credited to the referrer (${referral})`);
 
-  const aliceRefAfter = (await prisma.balance.findUnique({ where: { userId_asset: { userId: alice.id, asset: "SOL" } } }))?.referralEarningsAmount ?? 0n;
+  const aliceRefAfter = (await prisma.balance.findUnique({ where: { userId_asset: { userId: alice.id, asset: "ETH" } } }))?.referralEarningsAmount ?? 0n;
   assert(aliceRefAfter - aliceRefBefore === referral, "referrer's claimable referral balance increased by the credited amount");
 
   // Conservation: table-locked total dropped by exactly the rake.
   let lockedAfter = 0n;
   for (const u of [alice, bob]) {
-    const b = await prisma.balance.findUniqueOrThrow({ where: { userId_asset: { userId: u.id, asset: "SOL" } } });
+    const b = await prisma.balance.findUniqueOrThrow({ where: { userId_asset: { userId: u.id, asset: "ETH" } } });
     lockedAfter += b.lockedAmount;
   }
   assert(lockedBefore - lockedAfter === expectedRake, `table-locked funds dropped by exactly the rake (${lockedBefore - lockedAfter})`);
 
   // Claim: referral earnings move to available.
-  const availBefore = (await reconcileUserBalance(alice.id, "SOL")).ledgerAvailable;
-  const claimed = await claimReferralEarnings({ userId: alice.id, asset: "SOL", correlationId: `rake-claim:${alice.id}:${Date.now()}` });
-  const availAfter = (await reconcileUserBalance(alice.id, "SOL")).ledgerAvailable;
+  const availBefore = (await reconcileUserBalance(alice.id, "ETH")).ledgerAvailable;
+  const claimed = await claimReferralEarnings({ userId: alice.id, asset: "ETH", correlationId: `rake-claim:${alice.id}:${Date.now()}` });
+  const availAfter = (await reconcileUserBalance(alice.id, "ETH")).ledgerAvailable;
   assert(claimed === aliceRefAfter, `claim moved the full referral balance (${claimed})`);
   assert(availAfter - availBefore === claimed, "claimed amount landed in available balance");
-  const recon = await reconcileUserBalance(alice.id, "SOL");
+  const recon = await reconcileUserBalance(alice.id, "ETH");
   assert(recon.ok && recon.cachedReferral === 0n, "referrer balance reconciles and referral bucket is emptied");
 
   // Cleanup.
   for (const u of [alice, bob]) {
-    const b = await prisma.balance.findUniqueOrThrow({ where: { userId_asset: { userId: u.id, asset: "SOL" } } });
-    if (b.lockedAmount > 0n) await cashOutSeat({ userId: u.id, asset: "SOL", amount: b.lockedAmount, tableId: table.id, correlationId: `rake-cashout:${u.id}:${Date.now()}` });
+    const b = await prisma.balance.findUniqueOrThrow({ where: { userId_asset: { userId: u.id, asset: "ETH" } } });
+    if (b.lockedAmount > 0n) await cashOutSeat({ userId: u.id, asset: "ETH", amount: b.lockedAmount, tableId: table.id, correlationId: `rake-cashout:${u.id}:${Date.now()}` });
   }
   await prisma.user.update({ where: { id: bob.id }, data: { referredById: null } });
 

@@ -15,7 +15,7 @@ import { DEFAULT_RAKE_BPS } from "@/lib/poker/rake";
 import { env, isTokenConfigured } from "@/lib/env";
 import { getAssetPrices } from "@/lib/pricing/prices";
 
-/** SOL amount (decimal) -> lamports (free-play demo only). */
+/** ETH amount (decimal) -> wei (free-play demo only). */
 function sol(n: number): bigint {
   return BigInt(Math.round(n * 1e9));
 }
@@ -71,7 +71,7 @@ const DEMO_ROOM: HouseRoom = {
 async function upsertRoom(
   r: HouseRoom,
   isDemo: boolean,
-  asset: "SOL" | "USDC" | "TOKEN",
+  asset: "ETH" | "USDC" | "TOKEN",
 ): Promise<void> {
   const fields = {
     name: r.name,
@@ -100,7 +100,7 @@ async function upsertRoom(
 
 export async function seedHouseRooms(): Promise<number> {
   // Free-play demo (no real money) always seeds.
-  await upsertRoom(DEMO_ROOM, true, "SOL");
+  await upsertRoom(DEMO_ROOM, true, "ETH");
 
   // Prune any house room no longer in the set (e.g. retired tiers).
   const keep = ["DEMO-FREEPLAY", ...TIERS.map((t) => t.code)];

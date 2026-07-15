@@ -4,7 +4,7 @@ import { getUserBalances } from "@/lib/queries";
 import { canPlayRealMoney } from "@/lib/compliance/gates";
 import { formatAmount, ASSET_SYMBOLS } from "@/lib/ledger/money";
 import { env, isTokenConfigured } from "@/lib/env";
-import { solscanTxUrl } from "@/lib/solana/explorer";
+import { explorerTxUrl } from "@/lib/chain/explorer";
 import { CashierPanel } from "@/components/cashier/cashier-panel";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
@@ -26,7 +26,7 @@ export default async function CashierPage() {
       take: 5,
     }),
     prisma.wallet.findFirst({
-      where: { userId: user.id, chain: "SOLANA" },
+      where: { userId: user.id, chain: "ROBINHOOD" },
       orderBy: { createdAt: "asc" },
     }),
   ]);
@@ -77,12 +77,12 @@ export default async function CashierPage() {
                     </span>
                     <div className="flex items-center gap-3">
                       <a
-                        href={solscanTxUrl(d.txSignature)}
+                        href={explorerTxUrl(d.txHash)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-pogo-soft underline decoration-pogo-soft/40 underline-offset-2 hover:text-pogo"
                       >
-                        Solscan ↗
+                        Blockscout ↗
                       </a>
                       <StatusBadge status={d.status} />
                     </div>
@@ -105,14 +105,14 @@ export default async function CashierPage() {
                       {formatAmount(w.asset, w.amount)} {ASSET_SYMBOLS[w.asset]}
                     </span>
                     <div className="flex items-center gap-3">
-                      {w.txSignature && (
+                      {w.txHash && (
                         <a
-                          href={solscanTxUrl(w.txSignature)}
+                          href={explorerTxUrl(w.txHash)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs text-pogo-soft underline decoration-pogo-soft/40 underline-offset-2 hover:text-pogo"
                         >
-                          Solscan ↗
+                          Blockscout ↗
                         </a>
                       )}
                       <StatusBadge status={w.status} />

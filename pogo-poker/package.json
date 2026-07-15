@@ -2,7 +2,7 @@
   "name": "pogo-poker",
   "version": "0.1.0",
   "private": true,
-  "description": "Pogo Poker — the pond's private real-money Solana poker room (a POGO THE LEAPER utility)",
+  "description": "Pogo Poker — the pond's private real-money poker room on Robinhood Chain (a POGO THE LEAPER utility)",
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev --turbo",
@@ -39,10 +39,6 @@
     "@prisma/client": "^5.22.0",
     "@privy-io/react-auth": "^3.29.2",
     "@privy-io/server-auth": "^1.32.5",
-    "@solana-program/memo": "0.10.0",
-    "@solana/spl-token": "^0.4.9",
-    "@solana/web3.js": "^1.95.4",
-    "bs58": "^6.0.0",
     "clsx": "^2.1.1",
     "ioredis": "^5.4.1",
     "livekit-client": "^2.19.2",
@@ -52,6 +48,7 @@
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.5.4",
     "tsx": "^4.19.2",
+    "viem": "^2.52.0",
     "ws": "^8.18.0",
     "zod": "^3.23.8"
   },

@@ -15,7 +15,7 @@ const features = [
   {
     eyebrow: "Access",
     title: "Wallet-only private rooms",
-    copy: "Privy sign-in, Solana wallets, invite-first tables.",
+    copy: "Privy sign-in, Robinhood Chain wallets, invite-first tables.",
     stat: "Private codes",
   },
   {
@@ -241,7 +241,7 @@ function FeatureCard({
 
 function AppShell({ frame }: { frame: number }) {
   const tab = Math.floor(interpolate(frame, [165, 610], [0, 4], clamp));
-  const rows = ["The Pogo Room", "Founders Table", "Solana Highline"];
+  const rows = ["The Pogo Room", "Founders Table", "Robinhood Highline"];
   return (
     <GlassPanel
       style={{
@@ -559,7 +559,7 @@ export const PogoPlatformPromo = () => {
             marginBottom: 22,
           }}
         >
-          Private cardroom / Solana
+          Private cardroom / Robinhood Chain
         </div>
         <div
           style={{
@@ -581,7 +581,7 @@ export const PogoPlatformPromo = () => {
             lineHeight: 1.42,
           }}
         >
-          Real-money tables, Solana settlement, verifiable hands, and a ledger-first operating core.
+          Real-money tables, Robinhood Chain settlement, verifiable hands, and a ledger-first operating core.
         </div>
       </div>
 
@@ -663,7 +663,7 @@ export const PogoPlatformPromo = () => {
               lineHeight: 1.42,
             }}
           >
-            Pogo Poker brings poker, Solana settlement, and operational controls into one restrained product surface.
+            Pogo Poker brings poker, Robinhood Chain settlement, and operational controls into one restrained product surface.
           </div>
         </div>
       </div>

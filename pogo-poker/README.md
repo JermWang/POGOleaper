@@ -4,13 +4,13 @@
 > memecoin brand. The app name lives in one place (`src/components/brand.tsx`)
 > and the accent palette in `tailwind.config.ts` (`pogo` green/gold tokens).
 
-A private, elegant, **real-money Solana poker room**: Texas Hold'em cash games
+A private, elegant, **real-money poker room on Robinhood Chain** (EVM, Arbitrum Orbit L2): Texas Hold'em cash games
 with custodial balances, an internal double-entry ledger, a verifiable
 (commit-reveal) shuffle, server-authoritative gameplay, and a compliance/risk
 foundation.
 
 **No smart contracts. No Anchor. No NFTs. No on-chain poker engine.** Deposits
-and withdrawals settle on Solana; everything else is server-side and ledgered.
+and withdrawals settle on Robinhood Chain; everything else is server-side and ledgered.
 
 ---
 
@@ -20,13 +20,13 @@ and withdrawals settle on Solana; everything else is server-side and ledgered.
 - **Prisma + PostgreSQL** — persistence
 - **Redis** — table locks / pub-sub (wired via `REDIS_URL`; see TODO)
 - **WebSockets** (`ws`) — realtime gameplay, a **standalone process**
-- **Privy** — auth + embedded Solana wallets
-- **@solana/web3.js** — deposit monitoring & withdrawals (mocked in dev)
+- **Privy** — auth + embedded EVM wallets (Robinhood Chain)
+- **viem** — deposit monitoring & withdrawals on Robinhood Chain (mocked in dev)
 - **Vitest** — engine & money unit tests
 
 ## Money rules (non-negotiable)
 
-- Money is **never** a float. SOL = **lamports** (`bigint`), USDC = **base units** (`bigint`).
+- Money is **never** a float. ETH = **wei** (`bigint`), USDC = **base units** (`bigint`).
 - All balance changes go through the **ledger** (`src/lib/ledger`) inside a DB
   transaction. Nothing mutates `Balance` directly.
 - Every ledger transaction is **balanced** (sum of credits == debits) — money is
@@ -50,7 +50,7 @@ src/
       tests/           # vitest suites
     realtime/          # event contracts, TableRoom, standalone WS server, client hook
     risk/              # risk events + collusion heuristics
-    solana/            # chain provider interface + mock, deposits, withdrawals, wallets
+    chain/             # EVM provider interface + mock, deposits, withdrawals, wallets, anchoring
     jobs/              # deposit-monitor, withdrawal-processor, reconciliation
 prisma/                # schema.prisma + seed.ts
 ```
@@ -72,7 +72,7 @@ npm install
 cp .env.example .env     # fill in DATABASE_URL at minimum
 ```
 
-In development you can leave Privy/Solana blank — the app uses a **dev sign-in**
+In development you can leave Privy/chain config blank — the app uses a **dev sign-in**
 and **mock chain/compliance** providers. Keep `ENABLE_DEV_COMPLIANCE_APPROVAL=true`
 to auto-approve KYC/geo locally (this flag lives only at the provider boundary).
 

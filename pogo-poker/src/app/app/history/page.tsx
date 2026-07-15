@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/auth/require-user";
 import { prisma } from "@/lib/db/prisma";
 import { formatAmount, ASSET_SYMBOLS } from "@/lib/ledger/money";
-import { solscanTxUrl } from "@/lib/solana/explorer";
+import { explorerTxUrl } from "@/lib/chain/explorer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { VerifyHandDrawer } from "@/components/poker/verify-hand-drawer";
@@ -9,9 +9,9 @@ import { VerifyHandDrawer } from "@/components/poker/verify-hand-drawer";
 export const dynamic = "force-dynamic";
 
 /** Pull an on-chain tx signature out of a ledger entry's metadata, if present. */
-function txSignatureOf(metadata: unknown): string | null {
+function txHashOf(metadata: unknown): string | null {
   if (metadata && typeof metadata === "object" && !Array.isArray(metadata)) {
-    const sig = (metadata as Record<string, unknown>).txSignature;
+    const sig = (metadata as Record<string, unknown>).txHash;
     if (typeof sig === "string" && sig.length > 0) return sig;
   }
   return null;
@@ -103,7 +103,7 @@ export default async function HistoryPage() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {ledger.map((e) => {
-                    const sig = txSignatureOf(e.metadata);
+                    const sig = txHashOf(e.metadata);
                     return (
                       <tr key={e.id}>
                         <td className="py-2 text-ash">
@@ -122,12 +122,12 @@ export default async function HistoryPage() {
                         <td className="py-2 text-right">
                           {sig ? (
                             <a
-                              href={solscanTxUrl(sig)}
+                              href={explorerTxUrl(sig)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-pogo-soft underline decoration-pogo-soft/40 underline-offset-2 hover:text-pogo"
                             >
-                              Solscan ↗
+                              Blockscout ↗
                             </a>
                           ) : (
                             <span className="text-ash/40">—</span>

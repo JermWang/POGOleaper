@@ -9,7 +9,7 @@
 
 import { PrismaClient } from "@prisma/client";
 import { creditDeposit } from "../src/lib/ledger/ledger";
-import { parseSolToLamports, parseUsdcToBaseUnits } from "../src/lib/ledger/money";
+import { parseEthToWei, parseUsdcToBaseUnits } from "../src/lib/ledger/money";
 import { generateInviteCode } from "../src/lib/crypto";
 
 const prisma = new PrismaClient();
@@ -54,8 +54,8 @@ async function main() {
     if (!already) {
       await creditDeposit({
         userId: u.id,
-        asset: "SOL",
-        amount: parseSolToLamports("25"),
+        asset: "ETH",
+        amount: parseEthToWei("25"),
         correlationId: solCorr,
         metadata: { seed: true },
       });
@@ -78,11 +78,11 @@ async function main() {
       data: {
         hostUserId: admin.id,
         name: "The Pogo Room",
-        asset: "SOL",
-        smallBlind: parseSolToLamports("0.01"),
-        bigBlind: parseSolToLamports("0.02"),
-        minBuyIn: parseSolToLamports("1"),
-        maxBuyIn: parseSolToLamports("4"),
+        asset: "ETH",
+        smallBlind: parseEthToWei("0.01"),
+        bigBlind: parseEthToWei("0.02"),
+        minBuyIn: parseEthToWei("1"),
+        maxBuyIn: parseEthToWei("4"),
         maxSeats: 6,
         visibility: "PUBLIC",
         inviteCode: generateInviteCode(),

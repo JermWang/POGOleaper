@@ -4,7 +4,7 @@ import type { LedgerTransactionInput } from "./entries";
 
 function tx(legs: LedgerTransactionInput["legs"]): LedgerTransactionInput {
   return {
-    asset: "SOL",
+    asset: "ETH",
     reason: "DEPOSIT_CONFIRMED",
     correlationId: "test",
     legs,

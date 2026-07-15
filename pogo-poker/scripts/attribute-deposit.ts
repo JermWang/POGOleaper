@@ -4,23 +4,23 @@
  * auto-match it). Uses the app's own assignUnattributedDeposit so the ledger
  * stays consistent + idempotent. DB credit + RPC read only — no on-chain send.
  *
- * Run: npx tsx --env-file=.env scripts/attribute-deposit.ts <txSignature> <userId>
+ * Run: npx tsx --env-file=.env scripts/attribute-deposit.ts <txHash> <userId>
  */
 
 import { prisma } from "../src/lib/db/prisma";
-import { assignUnattributedDeposit } from "../src/lib/solana/deposits";
+import { assignUnattributedDeposit } from "../src/lib/chain/deposits";
 
 const TX = process.argv[2];
 const USER = process.argv[3];
 
 async function main() {
   if (!TX || !USER) {
-    console.error("usage: attribute-deposit.ts <txSignature> <userId>");
+    console.error("usage: attribute-deposit.ts <txHash> <userId>");
     process.exit(1);
   }
-  const dep = await prisma.deposit.findUnique({ where: { txSignature: TX } });
+  const dep = await prisma.deposit.findUnique({ where: { txHash: TX } });
   if (!dep) {
-    console.error("No deposit with that txSignature");
+    console.error("No deposit with that txHash");
     process.exit(1);
   }
   console.log(
