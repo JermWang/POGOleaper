@@ -1203,19 +1203,18 @@ function buyPogo() {
 }
 
 function copyContract() {
-    // TODO: replace with the real $POGO contract address at launch
-    const contractAddress = '$POGO — contract address coming soon';
+    const contractAddress = '0xb63bea8989b5016ddf63751c828b953da9287777';
 
     if (navigator.clipboard) {
         navigator.clipboard.writeText(contractAddress).then(() => {
             playKitchenSound();
-            showNotification('🐸 $POGO CA drops soon — stay froggy!');
+            showNotification('🐸 $POGO CA copied — stay froggy!');
         }).catch(() => {
             showNotification('❌ Failed to copy');
         });
     } else {
         playKitchenSound();
-        showNotification('🐸 $POGO CA drops soon — stay froggy!');
+        showNotification('🐸 $POGO CA copied — stay froggy!');
     }
 }
 
