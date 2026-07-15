@@ -41,10 +41,7 @@ export default function StartScreen() {
       <main className="poker-landing-main">
         <section className="poker-hero-copy">
           <span className="poker-eyebrow">Private Hold&apos;em on Robinhood Chain</span>
-          <h1>
-            Serious poker.
-            <span>Made for the pond.</span>
-          </h1>
+          <h1 className="poker-hero-title">Pogo Poker</h1>
           <p>
             Host a private table, join a live game, and settle every hand with a
             cardroom that feels focused from the first deal.

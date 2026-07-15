@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Bungee, Cormorant_Garamond, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { APP_NAME_FULL } from "@/components/brand";
 import { Providers } from "@/components/providers";
@@ -10,6 +10,13 @@ const display = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
   variable: "--font-display",
+  display: "swap",
+});
+// Cartoon poster face for the Pogo brand headline (matches the site + promo).
+const poster = Bungee({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-poster",
   display: "swap",
 });
 const sans = Hanken_Grotesk({
@@ -62,7 +69,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${sans.variable} ${mono.variable}`}
+      className={`${display.variable} ${poster.variable} ${sans.variable} ${mono.variable}`}
     >
       <body className="min-h-screen">
         <Providers>{children}</Providers>

@@ -364,6 +364,23 @@
   letter-spacing: -0.035em;
 }
 
+/* Cartoon gold-poster brand headline (Bungee + ink outline + hard drop
+   shadow) — matches the main site's arcade skin and the promo video. High
+   specificity so the clamp size holds across the responsive breakpoints. */
+.poker-hero-copy h1.poker-hero-title {
+  margin: 14px 0 24px;
+  font-family: var(--font-poster), "Bungee", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(3.1rem, 6.4vw, 5.5rem);
+  line-height: 0.94;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: #fbbf24;
+  -webkit-text-stroke: 4px #12210d;
+  paint-order: stroke fill;
+  filter: drop-shadow(5px 7px 0 rgba(18, 33, 13, 0.3));
+}
+
 .poker-hero-copy > p {
   max-width: 520px;
   margin: 0;
