@@ -1496,15 +1496,32 @@ class GameAssets {
         ctx.strokeStyle = 'rgba(146, 64, 14, 0.55)';
         ctx.stroke();
 
-        // "P" mark (only when the coin is turned toward us)
+        // Embossed Pogo face (two eyes + smile) — only when turned toward us.
+        // Same-tone relief so it reads as a stamp on the coin, not a frog.
         if (spin > 0.72) {
             ctx.save();
-            ctx.scale(1 / spin, 1); // un-squash the letter so it stays legible
-            ctx.fillStyle = 'rgba(120, 72, 12, 0.85)';
-            ctx.font = `bold ${Math.round(r * 1.15)}px "Bungee", system-ui, sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('P', 0, 1);
+            ctx.scale(1 / spin, 1); // un-squash so the face stays round
+            const relief = 'rgba(122, 74, 12, 0.9)';
+            ctx.fillStyle = relief;
+            ctx.beginPath();
+            ctx.ellipse(-r * 0.32, -r * 0.1, r * 0.25, r * 0.3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(r * 0.32, -r * 0.1, r * 0.25, r * 0.3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 247, 210, 0.9)';
+            ctx.beginPath();
+            ctx.arc(-r * 0.4, -r * 0.22, r * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(r * 0.24, -r * 0.22, r * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = relief;
+            ctx.lineWidth = Math.max(2, r * 0.12);
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(0, r * 0.05, r * 0.33, 0.12 * Math.PI, 0.88 * Math.PI);
+            ctx.stroke();
             ctx.restore();
         }
 
