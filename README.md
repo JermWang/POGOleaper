@@ -45,7 +45,7 @@ that link (in `index.html`, both desktop nav and mobile menu) at its real URL.
 - Real `$POGO` contract address: `copyContract()` in `script.js` + Pond Info card in `index.html`
 - Social links: `openDiscord()` / `openTelegram()` / `openDexScreener()` in `script.js` are "coming soon" placeholders; Twitter points at `x.com/PogoTheLeaper`
 - Pogo Poker's landing X link is also set to `x.com/pogotheleaper` — confirm handle
-- Domain in meta tags is `PogoTheLeaper.com` — update if different
+- Live domain: `pogotheleaper.xyz` (Vercel, project pog-oleaper)
 
 ## Asset sources
 
