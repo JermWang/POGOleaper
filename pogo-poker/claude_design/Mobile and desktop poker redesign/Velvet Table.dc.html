@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0a0b0d; -webkit-font-smoothing:antialiased; }
+  @keyframes vt-deal { from { opacity:0; transform:translateY(-34px) rotate(-7deg) scale(0.78); } to { opacity:1; transform:none; } }
+  @keyframes vt-chipin { from { opacity:0; transform:translateY(9px) scale(0.55); } to { opacity:1; transform:none; } }
+  @keyframes vt-rise { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+  @keyframes vt-deplete { from { stroke-dashoffset:0; } to { stroke-dashoffset:157; } }
+  @keyframes vt-ringpulse { 0%,100% { opacity:0.4; } 50% { opacity:1; } }
+  @keyframes vt-attn { 0%,100% { box-shadow:0 0 0 1px rgba(176,58,72,0.45), 0 -10px 40px -18px rgba(176,58,72,0.5); } 50% { box-shadow:0 0 0 3px rgba(176,58,72,0.45), 0 -10px 50px -14px rgba(176,58,72,0.75); } }
+  @keyframes vt-float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+  .vt-range { -webkit-appearance:none; appearance:none; height:5px; border-radius:999px; background:linear-gradient(90deg,#8f1d2c,#b03a48); outline:none; }
+  .vt-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%; background:#f4f1e8; border:3px solid #b03a48; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.5); }
+  .vt-range::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:#f4f1e8; border:3px solid #b03a48; cursor:pointer; }
+  .vt-btn { font-family:'Hanken Grotesk',sans-serif; cursor:pointer; transition:transform .12s ease, filter .12s ease; }
+  .vt-btn:hover { filter:brightness(1.08); }
+  .vt-btn:active { transform:translateY(1px); }
+</style>
+</helmet>
+
+<div style="min-width:100%;width:max-content;min-height:100vh;box-sizing:border-box;padding:30px 40px 56px;background:radial-gradient(80rem 60rem at 80% -10%, rgba(143,29,44,0.07), transparent 60%), radial-gradient(60rem 60rem at -10% 110%, rgba(18,56,43,0.22), transparent 60%), #0a0b0d;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#eceef1;">
+
+  <!-- Toolbar -->
+  <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;max-width:1620px;margin-bottom:26px;">
+    <div style="display:flex;align-items:center;gap:11px;">
+      <span style="display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:1px solid rgba(176,58,72,0.4);background:linear-gradient(180deg,rgba(176,58,72,0.2),rgba(176,58,72,0.05));font-family:'Cormorant Garamond',serif;font-size:20px;color:#d68b94;line-height:1;">V</span>
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:21px;line-height:1;">Velvet Poker<span style="color:#b03a48;">.</span></div>
+        <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#6b727c;margin-top:3px;">Live table · desktop &amp; mobile</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:7px;margin-left:6px;">
+      <sc-for list="{{ phases }}" as="ph" hint-placeholder-count="5">
+        <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid {{ ph.bc }};color:{{ ph.color }};background:{{ ph.bg }};">{{ ph.label }}</span>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-left:auto;">
+      <span style="font-size:12.5px;color:#9aa1ab;max-width:280px;">{{ message }}</span>
+      <button class="vt-btn" onClick="{{ toggleAuto }}" style="font-size:12px;color:{{ autoColor }};background:{{ autoBg }};border:1px solid {{ autoBorder }};padding:9px 14px;border-radius:10px;">Auto-play {{ autoLabel }}</button>
+      <button class="vt-btn" onClick="{{ deal }}" style="font-size:13px;font-weight:600;color:#fff;background:linear-gradient(180deg,#b03a48,#8f1d2c);border:none;padding:10px 20px;border-radius:11px;box-shadow:0 8px 20px -8px rgba(143,29,44,0.6), inset 0 1px 0 rgba(255,255,255,0.18);">{{ dealLabel }}</button>
+    </div>
+  </div>
+
+  <!-- Frames -->
+  <div style="display:flex;align-items:flex-start;gap:48px;">
+
+    <!-- ============ DESKTOP ============ -->
+    <div style="flex:none;width:1180px;">
+      <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b727c;margin-bottom:11px;">Desktop</div>
+      <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.09);background:#0e1014;box-shadow:0 50px 110px -50px rgba(0,0,0,0.9);">
+        <!-- window chrome -->
+        <div style="display:flex;align-items:center;gap:8px;padding:11px 16px;background:#15171c;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span style="width:11px;height:11px;border-radius:50%;background:#e0696f;"></span>
+          <span style="width:11px;height:11px;border-radius:50%;background:#e3c06b;"></span>
+          <span style="width:11px;height:11px;border-radius:50%;background:#7fae93;"></span>
+          <div style="margin:0 auto;font-size:12px;color:#6b727c;font-family:'JetBrains Mono',monospace;">velvet.poker/app/tables/ivory-room</div>
+        </div>
+        <!-- app header -->
+        <div style="display:flex;align-items:center;gap:16px;padding:12px 20px;background:rgba(16,18,22,0.9);border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex;align-items:center;gap:9px;">
+            <span style="display:grid;place-items:center;width:28px;height:28px;border-radius:8px;border:1px solid rgba(176,58,72,0.4);background:linear-gradient(180deg,rgba(176,58,72,0.18),rgba(176,58,72,0.05));font-family:'Cormorant Garamond',serif;font-size:16px;color:#d68b94;line-height:1;">V</span>
+            <div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1;">{{ tableName }}</div>
+              <div style="font-size:10.5px;color:#6b727c;margin-top:2px;">No-Limit Hold'em · {{ blinds }} USDC · 6-max</div>
+            </div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+            <div style="display:flex;align-items:center;gap:8px;border-radius:999px;border:1px solid rgba(176,58,72,0.28);background:linear-gradient(180deg,rgba(176,58,72,0.1),rgba(176,58,72,0.03));padding:6px 13px;">
+              <span style="font-size:11px;font-weight:600;color:#d68b94;">USDC</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:13.5px;color:#f4f1e8;">{{ balanceText }}</span>
+            </div>
+            <span style="width:8px;height:8px;border-radius:50%;background:#7fae93;box-shadow:0 0 8px rgba(127,174,147,0.6);"></span>
+            <button class="vt-btn" style="font-size:12px;color:#c7ccd3;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);padding:7px 14px;border-radius:9px;">Leave</button>
+          </div>
+        </div>
+
+        <!-- table area -->
+        <div style="position:relative;height:560px;background:radial-gradient(120% 90% at 50% 8%, rgba(27,77,58,0.18), transparent 55%), #0c0d10;overflow:hidden;">
+          <!-- felt + rail -->
+          <div style="position:absolute;inset:18px 96px;">
+            <div style="position:absolute;inset:0;border-radius:50%;background:linear-gradient(180deg,#2c171b 0%,#1a0d10 60%,#140a0c 100%);padding:20px;box-sizing:border-box;box-shadow:0 44px 90px -38px rgba(0,0,0,0.85), inset 0 2px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(176,58,72,0.26), inset 0 -8px 20px rgba(0,0,0,0.5);">
+              <div style="position:absolute;inset:20px;border-radius:50%;overflow:hidden;background:radial-gradient(ellipse at 50% 40%, #1d5440 0%, #143b2d 50%, #0c2820 100%);box-shadow:inset 0 0 70px rgba(0,0,0,0.55), inset 0 0 0 2px rgba(255,255,255,0.04), inset 0 0 0 7px rgba(12,40,32,0.55);">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg, rgba(255,255,255,0.011) 0 2px, transparent 2px 6px);"></div>
+                <div style="position:absolute;inset:16px;border-radius:50%;border:1px solid rgba(176,58,72,0.16);"></div>
+                <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-58%);font-family:'Cormorant Garamond',serif;font-size:210px;color:rgba(255,255,255,0.022);line-height:1;pointer-events:none;">V</div>
+              </div>
+            </div>
+
+            <!-- pot -->
+            <div style="position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);z-index:3;">
+              <sc-if value="{{ showPot }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:9px;background:rgba(12,13,16,0.62);border:1px solid rgba(176,58,72,0.32);border-radius:999px;padding:6px 16px 6px 9px;backdrop-filter:blur(5px);">
+                  <span style="position:relative;display:inline-block;width:24px;height:24px;"><span style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#8f1d2c 0 30deg,#efe9df 30deg 60deg,#8f1d2c 60deg 90deg,#efe9df 90deg 120deg,#8f1d2c 120deg 150deg,#efe9df 150deg 180deg,#8f1d2c 180deg 210deg,#efe9df 210deg 240deg,#8f1d2c 240deg 270deg,#efe9df 270deg 300deg,#8f1d2c 300deg 330deg,#efe9df 330deg 360deg);box-shadow:0 -3px 0 -1px #6f1521, 0 -6px 0 -2px #8f1d2c, inset 0 0 0 3px rgba(255,255,255,0.14), inset 0 0 0 4px #b03a48;"></span></span>
+                  <span style="font-size:11px;color:#9aa1ab;">Pot</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#f0d4d8;">{{ potText }}</span>
+                </div>
+              </sc-if>
+            </div>
+
+            <!-- board -->
+            <div style="position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);display:flex;gap:8px;z-index:3;">
+              <sc-for list="{{ boardCells }}" as="b" hint-placeholder-count="5">
+                <sc-if value="{{ b.filled }}" hint-placeholder-val="{{ false }}">
+                  <div style="animation:vt-deal 0.5s ease-out both;"><dc-import name="Card" rank="{{ b.rankText }}" suit="{{ b.suit }}" face-down="{{ false }}" w="56" h="78" hint-size="56px,78px"></dc-import></div>
+                </sc-if>
+                <sc-if value="{{ b.empty }}" hint-placeholder-val="{{ true }}">
+                  <div style="width:56px;height:78px;border-radius:8px;border:1px dashed rgba(255,255,255,0.08);background:rgba(0,0,0,0.14);"></div>
+                </sc-if>
+              </sc-for>
+            </div>
+
+            <!-- bet chips -->
+            <sc-for list="{{ seats }}" as="s" hint-placeholder-count="0">
+              <sc-if value="{{ s.betText }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:{{ s.betDX }}%;top:{{ s.betDY }}%;transform:translate(-50%,-50%);z-index:4;">
+                  <div style="display:flex;align-items:center;gap:6px;animation:vt-chipin 0.4s ease-out both;">
+                    <span style="position:relative;display:inline-block;width:20px;height:20px;"><span style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#8f1d2c 0 30deg,#efe9df 30deg 60deg,#8f1d2c 60deg 90deg,#efe9df 90deg 120deg,#8f1d2c 120deg 150deg,#efe9df 150deg 180deg,#8f1d2c 180deg 210deg,#efe9df 210deg 240deg,#8f1d2c 240deg 270deg,#efe9df 270deg 300deg,#8f1d2c 300deg 330deg,#efe9df 330deg 360deg);box-shadow:0 -3px 0 -1px #6f1521, 0 -5px 0 -2px #8f1d2c, inset 0 0 0 2px rgba(255,255,255,0.14), inset 0 0 0 3px #b03a48;"></span></span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#eceef1;background:rgba(12,13,16,0.78);padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);">{{ s.betText }}</span>
+                  </div>
+                </div>
+              </sc-if>
+            </sc-for>
+
+            <!-- seats -->
+            <sc-for list="{{ seats }}" as="s" hint-placeholder-count="6">
+              <div style="position:absolute;left:{{ s.dx }}%;top:{{ s.dy }}%;transform:translate(-50%,-50%);width:128px;display:flex;flex-direction:column;align-items:center;opacity:{{ s.opacity }};transition:opacity .4s ease;z-index:5;">
+                <sc-if value="{{ s.showHand }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;justify-content:center;margin-bottom:-9px;z-index:2;">
+                    <sc-if value="{{ s.use3d }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:7px;animation:vt-float 4.5s ease-in-out infinite;filter:drop-shadow(0 12px 18px rgba(0,0,0,0.55));">
+                        <sc-for list="{{ s.cards }}" as="c" hint-placeholder-count="2">
+                          <dc-import name="Card3D" rank="{{ c.rankText }}" suit="{{ c.suit }}" size="md" tilt="{{ false }}" glow="{{ true }}" hint-size="66px,92px"></dc-import>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ s.use2d }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;gap:{{ s.cardGap }}px;">
+                        <sc-for list="{{ s.cards }}" as="c" hint-placeholder-count="2">
+                          <div style="animation:vt-deal 0.5s ease-out both;"><dc-import name="Card" rank="{{ c.rankText }}" suit="{{ c.suit }}" face-down="{{ c.faceDown }}" w="{{ s.cardW }}" h="{{ s.cardH }}" hint-size="34px,48px"></dc-import></div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+
+                <div style="position:relative;">
+                  <sc-if value="{{ s.active }}" hint-placeholder-val="{{ false }}">
+                    <svg viewBox="0 0 56 56" style="position:absolute;left:50%;top:50%;width:64px;height:64px;transform:translate(-50%,-50%) rotate(-90deg);overflow:visible;">
+                      <circle cx="28" cy="28" r="25" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="3"></circle>
+                      <circle cx="28" cy="28" r="25" fill="none" stroke="#d66a76" stroke-width="3" stroke-linecap="round" stroke-dasharray="157" style="animation:{{ s.ringAnim }};"></circle>
+                    </svg>
+                  </sc-if>
+                  <div style="width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:13px;letter-spacing:0.04em;background:{{ s.avatarBg }};border:2px solid {{ s.avatarBorder }};color:#eceef1;box-shadow:{{ s.glow }};">{{ s.initials }}</div>
+                  <sc-if value="{{ s.dealer }}" hint-placeholder-val="{{ false }}">
+                    <span style="position:absolute;bottom:-3px;right:-3px;width:19px;height:19px;border-radius:50%;background:#eceef1;color:#0e1014;font-size:10px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #0e1014;z-index:4;">D</span>
+                  </sc-if>
+                </div>
+
+                <div style="margin-top:-7px;min-width:88px;border-radius:999px;padding:4px 11px 5px;text-align:center;background:{{ s.pillBg }};border:1px solid rgba(255,255,255,0.08);box-shadow:0 7px 16px -9px rgba(0,0,0,0.75);z-index:3;">
+                  <div style="font-size:11px;color:#c7ccd3;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;">{{ s.name }}</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ s.stackColor }};line-height:1.25;">{{ s.stackText }}</div>
+                </div>
+
+                <sc-if value="{{ s.showAction }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:5px;font-size:9px;letter-spacing:0.13em;text-transform:uppercase;color:#aab0b9;background:rgba(12,13,16,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:2px 8px;">{{ s.last }}</div>
+                </sc-if>
+              </div>
+            </sc-for>
+
+            <!-- banner -->
+            <sc-if value="{{ banner }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);z-index:8;text-align:center;animation:vt-rise 0.5s ease-out both;">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1;color:#f4f1e8;text-shadow:0 4px 24px rgba(0,0,0,0.6);">{{ banner.title }}</div>
+                <div style="margin-top:9px;display:inline-block;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#fff;background:linear-gradient(180deg,#b03a48,#8f1d2c);padding:7px 16px;border-radius:999px;box-shadow:0 10px 26px -10px rgba(143,29,44,0.7);">{{ banner.sub }}</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <!-- action bar -->
+        <div style="background:linear-gradient(180deg,#14171c,#0e1014);border-top:1px solid rgba(255,255,255,0.07);padding:13px 20px;">
+          <sc-if value="{{ act.show }}" hint-placeholder-val="{{ false }}">
+            <div style="border-radius:14px;padding:13px 16px;background:rgba(143,29,44,0.06);animation:vt-attn 1.2s ease-in-out infinite;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#d68b94;">Your turn</span>
+              </div>
+              <sc-if value="{{ act.canRaise }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:9px;flex:1;min-width:320px;">
+                  <div style="display:flex;align-items:center;gap:7px;">
+                    <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:#9aa1ab;">Bet</span>
+                    <sc-for list="{{ act.presets }}" as="p" hint-placeholder-count="4">
+                      <button class="vt-btn" onClick="{{ p.onClick }}" style="font-size:12px;color:#d68b94;background:rgba(176,58,72,0.1);border:1px solid rgba(176,58,72,0.32);padding:4px 11px;border-radius:8px;">{{ p.label }}</button>
+                    </sc-for>
+                    <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:15px;color:#f4f1e8;">{{ act.betText }}</span>
+                  </div>
+                  <input class="vt-range" type="range" min="{{ act.min }}" max="{{ act.max }}" step="{{ act.step }}" value="{{ act.betValue }}" onInput="{{ act.onBet }}" onChange="{{ act.onBet }}" style="width:100%;">
+                </div>
+              </sc-if>
+              <div style="display:flex;align-items:center;gap:9px;margin-left:auto;">
+                <button class="vt-btn" onClick="{{ act.fold }}" style="font-size:14px;font-weight:500;color:#c7ccd3;background:transparent;border:1px solid rgba(255,255,255,0.16);padding:12px 22px;border-radius:11px;">Fold</button>
+                <button class="vt-btn" onClick="{{ act.callDo }}" style="font-size:14px;font-weight:600;color:#eceef1;background:#23272f;border:1px solid rgba(255,255,255,0.1);padding:12px 22px;border-radius:11px;">{{ act.callLabel }}</button>
+                <sc-if value="{{ act.canRaise }}" hint-placeholder-val="{{ true }}">
+                  <button class="vt-btn" onClick="{{ act.raiseDo }}" style="font-size:14px;font-weight:600;color:#fff;background:linear-gradient(180deg,#b03a48,#8f1d2c);border:none;padding:12px 24px;border-radius:11px;box-shadow:0 8px 20px -8px rgba(143,29,44,0.6), inset 0 1px 0 rgba(255,255,255,0.16);">{{ act.raiseLabel }}</button>
+                </sc-if>
+                <sc-if value="{{ act.showAllIn }}" hint-placeholder-val="{{ false }}">
+                  <button class="vt-btn" onClick="{{ act.allInDo }}" style="font-size:14px;font-weight:600;color:#e7b9c0;background:rgba(143,29,44,0.14);border:1px solid rgba(176,58,72,0.5);padding:12px 20px;border-radius:11px;">{{ act.allInLabel }}</button>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ statusShow }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;height:58px;color:#9aa1ab;font-size:13.5px;">
+              <span style="width:7px;height:7px;border-radius:50%;background:#b03a48;animation:vt-ringpulse 1.4s ease-in-out infinite;"></span>
+              {{ status }}
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MOBILE ============ -->
+    <div style="flex:none;width:392px;">
+      <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b727c;margin-bottom:11px;">Mobile · portrait</div>
+      <div style="width:392px;border-radius:52px;padding:12px;background:linear-gradient(160deg,#26282c,#0d0e10);box-shadow:0 50px 110px -50px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(255,255,255,0.06);">
+        <div style="position:relative;border-radius:42px;overflow:hidden;background:#0c0d10;height:812px;display:flex;flex-direction:column;">
+          <!-- status bar -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 26px 6px;font-size:12px;color:#eceef1;font-weight:600;">
+            <span>9:41</span>
+            <span style="position:absolute;left:50%;top:10px;transform:translateX(-50%);width:96px;height:26px;background:#000;border-radius:999px;"></span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c7ccd3;">5G ▰▰▰</span>
+          </div>
+          <!-- header -->
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(16,18,22,0.85);">
+            <button class="vt-btn" style="width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#c7ccd3;font-size:15px;">‹</button>
+            <div style="text-align:center;flex:1;">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1;">{{ tableName }}</div>
+              <div style="font-size:9.5px;color:#6b727c;margin-top:2px;">NLH · {{ blinds }} USDC · 6-max</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;border-radius:999px;border:1px solid rgba(176,58,72,0.28);background:rgba(176,58,72,0.08);padding:5px 9px;">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#f0d4d8;">{{ balanceText }}</span>
+            </div>
+          </div>
+
+          <!-- table area -->
+          <div style="position:relative;flex:1;background:radial-gradient(120% 70% at 50% 6%, rgba(27,77,58,0.2), transparent 55%), #0c0d10;overflow:hidden;">
+            <div style="position:absolute;inset:30px 14px 96px;">
+              <div style="position:absolute;inset:0;border-radius:50%;background:linear-gradient(180deg,#2c171b 0%,#1a0d10 60%,#140a0c 100%);padding:13px;box-sizing:border-box;box-shadow:0 30px 60px -30px rgba(0,0,0,0.85), inset 0 2px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(176,58,72,0.26);">
+                <div style="position:absolute;inset:13px;border-radius:50%;overflow:hidden;background:radial-gradient(ellipse at 50% 42%, #1d5440 0%, #143b2d 50%, #0c2820 100%);box-shadow:inset 0 0 50px rgba(0,0,0,0.55), inset 0 0 0 2px rgba(255,255,255,0.04), inset 0 0 0 6px rgba(12,40,32,0.55);">
+                  <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg, rgba(255,255,255,0.011) 0 2px, transparent 2px 6px);"></div>
+                  <div style="position:absolute;inset:12px;border-radius:50%;border:1px solid rgba(176,58,72,0.16);"></div>
+                  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-58%);font-family:'Cormorant Garamond',serif;font-size:140px;color:rgba(255,255,255,0.022);line-height:1;pointer-events:none;">V</div>
+                </div>
+              </div>
+
+              <!-- pot -->
+              <div style="position:absolute;left:50%;top:33%;transform:translate(-50%,-50%);z-index:3;">
+                <sc-if value="{{ showPot }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:6px;background:rgba(12,13,16,0.62);border:1px solid rgba(176,58,72,0.32);border-radius:999px;padding:4px 11px 4px 6px;backdrop-filter:blur(5px);">
+                    <span style="position:relative;display:inline-block;width:17px;height:17px;"><span style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#8f1d2c 0 30deg,#efe9df 30deg 60deg,#8f1d2c 60deg 90deg,#efe9df 90deg 120deg,#8f1d2c 120deg 150deg,#efe9df 150deg 180deg,#8f1d2c 180deg 210deg,#efe9df 210deg 240deg,#8f1d2c 240deg 270deg,#efe9df 270deg 300deg,#8f1d2c 300deg 330deg,#efe9df 330deg 360deg);box-shadow:inset 0 0 0 2px rgba(255,255,255,0.14), inset 0 0 0 3px #b03a48;"></span></span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#f0d4d8;">{{ potText }}</span>
+                  </div>
+                </sc-if>
+              </div>
+
+              <!-- board -->
+              <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:5px;z-index:3;">
+                <sc-for list="{{ boardCells }}" as="b" hint-placeholder-count="5">
+                  <sc-if value="{{ b.filled }}" hint-placeholder-val="{{ false }}">
+                    <div style="animation:vt-deal 0.5s ease-out both;"><dc-import name="Card" rank="{{ b.rankText }}" suit="{{ b.suit }}" face-down="{{ false }}" w="42" h="60" hint-size="42px,60px"></dc-import></div>
+                  </sc-if>
+                  <sc-if value="{{ b.empty }}" hint-placeholder-val="{{ true }}">
+                    <div style="width:42px;height:60px;border-radius:6px;border:1px dashed rgba(255,255,255,0.08);background:rgba(0,0,0,0.14);"></div>
+                  </sc-if>
+                </sc-for>
+              </div>
+
+              <!-- bet chips -->
+              <sc-for list="{{ seats }}" as="s" hint-placeholder-count="0">
+                <sc-if value="{{ s.betText }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;left:{{ s.betMX }}%;top:{{ s.betMY }}%;transform:translate(-50%,-50%);z-index:4;">
+                    <div style="display:flex;align-items:center;gap:4px;animation:vt-chipin 0.4s ease-out both;">
+                      <span style="position:relative;display:inline-block;width:15px;height:15px;"><span style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#8f1d2c 0 30deg,#efe9df 30deg 60deg,#8f1d2c 60deg 90deg,#efe9df 90deg 120deg,#8f1d2c 120deg 150deg,#efe9df 150deg 180deg,#8f1d2c 180deg 210deg,#efe9df 210deg 240deg,#8f1d2c 240deg 270deg,#efe9df 270deg 300deg,#8f1d2c 300deg 330deg,#efe9df 330deg 360deg);box-shadow:inset 0 0 0 2px rgba(255,255,255,0.14), inset 0 0 0 2px #b03a48;"></span></span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#eceef1;background:rgba(12,13,16,0.78);padding:1px 6px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);">{{ s.betText }}</span>
+                    </div>
+                  </div>
+                </sc-if>
+              </sc-for>
+
+              <!-- seats -->
+              <sc-for list="{{ seats }}" as="s" hint-placeholder-count="6">
+                <div style="position:absolute;left:{{ s.mx }}%;top:{{ s.my }}%;transform:translate(-50%,-50%);width:84px;display:flex;flex-direction:column;align-items:center;opacity:{{ s.opacity }};transition:opacity .4s ease;z-index:5;">
+                  <sc-if value="{{ s.showHand }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;justify-content:center;margin-bottom:-7px;z-index:2;">
+                      <sc-if value="{{ s.use3d }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;gap:5px;animation:vt-float 4.5s ease-in-out infinite;filter:drop-shadow(0 10px 14px rgba(0,0,0,0.55));">
+                          <sc-for list="{{ s.cards }}" as="c" hint-placeholder-count="2">
+                            <dc-import name="Card3D" rank="{{ c.rankText }}" suit="{{ c.suit }}" size="sm" tilt="{{ false }}" glow="{{ true }}" hint-size="50px,70px"></dc-import>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ s.use2d }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex;gap:{{ s.cardGapM }}px;">
+                          <sc-for list="{{ s.cards }}" as="c" hint-placeholder-count="2">
+                            <div style="animation:vt-deal 0.5s ease-out both;"><dc-import name="Card" rank="{{ c.rankText }}" suit="{{ c.suit }}" face-down="{{ c.faceDown }}" w="{{ s.cardWM }}" h="{{ s.cardHM }}" hint-size="26px,36px"></dc-import></div>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-if>
+
+                  <div style="position:relative;">
+                    <sc-if value="{{ s.active }}" hint-placeholder-val="{{ false }}">
+                      <svg viewBox="0 0 56 56" style="position:absolute;left:50%;top:50%;width:50px;height:50px;transform:translate(-50%,-50%) rotate(-90deg);overflow:visible;">
+                        <circle cx="28" cy="28" r="25" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="4"></circle>
+                        <circle cx="28" cy="28" r="25" fill="none" stroke="#d66a76" stroke-width="4" stroke-linecap="round" stroke-dasharray="157" style="animation:{{ s.ringAnim }};"></circle>
+                      </svg>
+                    </sc-if>
+                    <div style="width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:11px;letter-spacing:0.04em;background:{{ s.avatarBg }};border:2px solid {{ s.avatarBorder }};color:#eceef1;box-shadow:{{ s.glow }};">{{ s.initials }}</div>
+                    <sc-if value="{{ s.dealer }}" hint-placeholder-val="{{ false }}">
+                      <span style="position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:#eceef1;color:#0e1014;font-size:8.5px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #0e1014;z-index:4;">D</span>
+                    </sc-if>
+                  </div>
+
+                  <div style="margin-top:-5px;min-width:66px;border-radius:999px;padding:3px 8px;text-align:center;background:{{ s.pillBg }};border:1px solid rgba(255,255,255,0.08);z-index:3;">
+                    <div style="font-size:9.5px;color:#c7ccd3;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px;">{{ s.name }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:{{ s.stackColor }};line-height:1.25;">{{ s.stackText }}</div>
+                  </div>
+
+                  <sc-if value="{{ s.showAction }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:3px;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:#aab0b9;background:rgba(12,13,16,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:5px;padding:1px 6px;">{{ s.last }}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+
+              <!-- banner -->
+              <sc-if value="{{ banner }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:50%;top:64%;transform:translate(-50%,-50%);z-index:8;text-align:center;animation:vt-rise 0.5s ease-out both;">
+                  <div style="font-family:'Cormorant Garamond',serif;font-size:25px;line-height:1;color:#f4f1e8;text-shadow:0 4px 20px rgba(0,0,0,0.6);">{{ banner.title }}</div>
+                  <div style="margin-top:7px;display:inline-block;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#fff;background:linear-gradient(180deg,#b03a48,#8f1d2c);padding:5px 12px;border-radius:999px;">{{ banner.sub }}</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+
+          <!-- mobile action bar -->
+          <div style="background:linear-gradient(180deg,#15181d,#0c0d10);border-top:1px solid rgba(255,255,255,0.07);padding:11px 14px 20px;">
+            <sc-if value="{{ act.show }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:11px;animation:vt-attn 1.2s ease-in-out infinite;border-radius:14px;padding:11px;background:rgba(143,29,44,0.06);">
+                <sc-if value="{{ act.canRaise }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <sc-for list="{{ act.presets }}" as="p" hint-placeholder-count="4">
+                        <button class="vt-btn" onClick="{{ p.onClick }}" style="flex:1;font-size:12px;color:#d68b94;background:rgba(176,58,72,0.1);border:1px solid rgba(176,58,72,0.32);padding:7px 0;border-radius:9px;">{{ p.label }}</button>
+                      </sc-for>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#f4f1e8;min-width:58px;text-align:right;">{{ act.betText }}</span>
+                    </div>
+                    <input class="vt-range" type="range" min="{{ act.min }}" max="{{ act.max }}" step="{{ act.step }}" value="{{ act.betValue }}" onInput="{{ act.onBet }}" onChange="{{ act.onBet }}" style="width:100%;">
+                  </div>
+                </sc-if>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <button class="vt-btn" onClick="{{ act.fold }}" style="flex:1;font-size:15px;font-weight:500;color:#c7ccd3;background:transparent;border:1px solid rgba(255,255,255,0.16);padding:15px 0;border-radius:12px;">Fold</button>
+                  <button class="vt-btn" onClick="{{ act.callDo }}" style="flex:1;font-size:15px;font-weight:600;color:#eceef1;background:#23272f;border:1px solid rgba(255,255,255,0.1);padding:15px 0;border-radius:12px;">{{ act.callLabel }}</button>
+                  <sc-if value="{{ act.canRaise }}" hint-placeholder-val="{{ true }}">
+                    <button class="vt-btn" onClick="{{ act.raiseDo }}" style="flex:1.4;font-size:15px;font-weight:600;color:#fff;background:linear-gradient(180deg,#b03a48,#8f1d2c);border:none;padding:15px 0;border-radius:12px;box-shadow:0 8px 18px -8px rgba(143,29,44,0.6), inset 0 1px 0 rgba(255,255,255,0.16);">{{ act.raiseLabel }}</button>
+                  </sc-if>
+                  <sc-if value="{{ act.showAllInOnly }}" hint-placeholder-val="{{ false }}">
+                    <button class="vt-btn" onClick="{{ act.allInDo }}" style="flex:1.2;font-size:15px;font-weight:600;color:#e7b9c0;background:rgba(143,29,44,0.16);border:1px solid rgba(176,58,72,0.5);padding:15px 0;border-radius:12px;">{{ act.allInLabel }}</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ statusShow }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;justify-content:center;gap:9px;height:56px;color:#9aa1ab;font-size:13px;">
+                <span style="width:7px;height:7px;border-radius:50%;background:#b03a48;animation:vt-ringpulse 1.4s ease-in-out infinite;"></span>
+                {{ status }}
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;autoPlay&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;tableName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Ivory Room&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;blinds&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;5 / 10&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.si = 0;
+    this.timer = null;
+    this._ctx = {};
+    this.state = this.freshState(true);
+    this.deal = () => this.start();
+    this.toggleAuto = () => {
+      this.setState(
+        (s) => ({ auto: !s.auto }),
+        () => { if (this.state.auto && this.state.yourTurn) this.resolve("call"); }
+      );
+    };
+  }
+
+  componentWillUnmount() { clearTimeout(this.timer); }
+
+  fmt(n) { return Number(n || 0).toLocaleString("en-US"); }
+
+  freshSeats() {
+    return [
+      { name: "You",    isYou: true,        cards: ["Ah", "Kh"], stack: 2480, dx: 50, dy: 93, mx: 50, my: 80 },
+      { name: "Dana",                       cards: ["?", "?"],   stack: 1950, dx: 7,  dy: 63, mx: 11, my: 45 },
+      { name: "Marcus",                     cards: ["?", "?"],   stack: 3200, dx: 15, dy: 19, mx: 21, my: 15 },
+      { name: "Sofia",  villain: true,      cards: ["Ks", "Kc"], stack: 1600, dx: 50, dy: 7,  mx: 50, my: 9  },
+      { name: "Ravi",                       cards: ["?", "?"],   stack: 880,  dx: 85, dy: 19, mx: 79, my: 15 },
+      { name: "Lena",   dealer: true,       cards: ["?", "?"],   stack: 2600, dx: 93, dy: 63, mx: 89, my: 45 },
+    ].map((s, i) => ({ ...s, seat: i, committed: 0, inHand: false, folded: false, allIn: false, last: null, revealed: false }));
+  }
+
+  freshState(initial) {
+    const auto = initial ? !!this.props.autoPlay : this.state.auto;
+    return {
+      seats: this.freshSeats(), board: [], pot: 0, currentBet: 0, bigBlind: 10,
+      phase: "idle", toAct: null, yourTurn: false, auto, started: false,
+      message: "Press \u201CDeal hand\u201D to start the hand.", banner: null, winner: null, show3d: false, betValue: 0,
+    };
+  }
+
+  label(name) { return ({ flop: "Flop", turn: "Turn", river: "River" })[name] || name; }
+
+  card(code, faceDown) {
+    const SYM = { s: "\u2660", h: "\u2665", d: "\u2666", c: "\u2663" };
+    if (!code || code === "?") return { rankText: "A", suit: "s", sym: SYM.s, faceDown: true };
+    const rank = code[0];
+    const suit = code[1];
+    return { rankText: rank === "T" ? "10" : rank, suit, sym: SYM[suit], faceDown: !!faceDown };
+  }
+
+  buildScript() {
+    return [
+      { k: "msg", text: "Dealing the hand\u2026", d: 200 },
+      { k: "deal", d: 1050 },
+      { k: "phase", name: "preflop", d: 150 },
+      { k: "toact", seat: 2, d: 650 },
+      { k: "bet", seat: 2, to: 10, label: "Call", d: 800 },
+      { k: "toact", seat: 3, d: 250 },
+      { k: "bet", seat: 3, to: 40, label: "Raise", d: 900 },
+      { k: "toact", seat: 4, d: 250 },
+      { k: "fold", seat: 4, d: 700 },
+      { k: "toact", seat: 5, d: 220 },
+      { k: "fold", seat: 5, d: 700 },
+      { k: "toact", seat: 1, d: 220 },
+      { k: "fold", seat: 1, d: 700 },
+      { k: "toact", seat: 0, d: 200 },
+      { k: "await", street: "preflop" },
+      { k: "toact", seat: 2, d: 350 },
+      { k: "bet", seat: 2, to: 40, label: "Call", d: 800 },
+      { k: "collect", d: 750 },
+      { k: "board", cards: ["Qh", "Jh", "4s"], name: "flop", d: 1050 },
+      { k: "toact", seat: 2, d: 550 },
+      { k: "check", seat: 2, d: 700 },
+      { k: "toact", seat: 3, d: 250 },
+      { k: "bet", seat: 3, to: 70, label: "Bet", d: 900 },
+      { k: "toact", seat: 0, d: 200 },
+      { k: "await", street: "flop" },
+      { k: "toact", seat: 2, d: 350 },
+      { k: "fold", seat: 2, d: 750 },
+      { k: "collect", d: 750 },
+      { k: "board", cards: ["9c"], name: "turn", d: 1050 },
+      { k: "toact", seat: 3, d: 600 },
+      { k: "bet", seat: 3, to: 150, label: "Bet", d: 900 },
+      { k: "toact", seat: 0, d: 200 },
+      { k: "await", street: "turn" },
+      { k: "collect", d: 750 },
+      { k: "board", cards: ["Th"], name: "river", d: 1050 },
+      { k: "toact", seat: 3, d: 650 },
+      { k: "allin", seat: 3, d: 950 },
+      { k: "toact", seat: 0, d: 200 },
+      { k: "await", street: "river" },
+      { k: "reveal", seat: 3, d: 800 },
+      { k: "collect", d: 550 },
+      { k: "show3d", d: 350 },
+      { k: "win", seat: 0, hand: "Royal Flush \u2665", opp: "Sofia's King-high straight", d: 300 },
+    ];
+  }
+
+  start() {
+    clearTimeout(this.timer);
+    this.SCRIPT = this.buildScript();
+    this.si = 0;
+    const auto = this.state.auto;
+    this.setState({ ...this.freshState(false), auto, started: true, message: "Dealing the hand\u2026" }, () => {
+      this.timer = setTimeout(() => this.tick(), 350);
+    });
+  }
+
+  tick() {
+    const a = this.SCRIPT[this.si];
+    if (!a) return;
+    if (a.k === "await") { this.si++; this.enterAwait(a); return; }
+    this.apply(a);
+    this.si++;
+    this.timer = setTimeout(() => this.tick(), a.d == null ? 700 : a.d);
+  }
+
+  apply(a) {
+    switch (a.k) {
+      case "msg": this.setState({ message: a.text }); break;
+      case "phase": this.setState({ phase: a.name }); break;
+      case "deal":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          seats.forEach((x) => { x.inHand = true; });
+          seats[0].revealed = true;
+          seats[0].committed = 5; seats[0].stack -= 5; seats[0].last = "SB";
+          seats[1].committed = 10; seats[1].stack -= 10; seats[1].last = "BB";
+          return { seats, currentBet: 10, toAct: null, message: "Hole cards dealt \u00B7 blinds posted" };
+        });
+        break;
+      case "toact": this.setState({ toAct: a.seat }); break;
+      case "bet":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          const o = seats[a.seat];
+          o.stack -= a.to - o.committed; o.committed = a.to; o.last = a.label;
+          const msg = a.label === "Call" ? o.name + " calls" : o.name + " " + a.label.toLowerCase() + "s to " + this.fmt(a.to);
+          return { seats, currentBet: Math.max(s.currentBet, a.to), toAct: a.seat, message: msg };
+        });
+        break;
+      case "check":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          seats[a.seat].last = "Check";
+          return { seats, toAct: a.seat, message: seats[a.seat].name + " checks" };
+        });
+        break;
+      case "fold":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          seats[a.seat].folded = true; seats[a.seat].last = "Fold";
+          return { seats, toAct: a.seat, message: seats[a.seat].name + " folds" };
+        });
+        break;
+      case "allin":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          const o = seats[a.seat];
+          const t = o.stack + o.committed; o.committed = t; o.stack = 0; o.allIn = true; o.last = "All-in";
+          return { seats, currentBet: Math.max(s.currentBet, t), toAct: a.seat, message: o.name + " moves all-in for " + this.fmt(t) };
+        });
+        break;
+      case "collect":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          let add = 0;
+          seats.forEach((x) => { add += x.committed; x.committed = 0; x.last = null; });
+          return { seats, pot: s.pot + add, currentBet: 0, toAct: null };
+        });
+        break;
+      case "board":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          seats.forEach((x) => { if (!x.folded) x.last = null; });
+          return { seats, board: [...s.board, ...a.cards], phase: a.name, toAct: null, message: this.label(a.name) + " dealt" };
+        });
+        break;
+      case "reveal":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          seats[a.seat].revealed = true;
+          return { seats, message: "Showdown" };
+        });
+        break;
+      case "show3d": this.setState({ show3d: true }); break;
+      case "win":
+        this.setState((s) => {
+          const seats = s.seats.map((x) => ({ ...x }));
+          let add = 0;
+          seats.forEach((x) => { add += x.committed; x.committed = 0; });
+          const total = s.pot + add;
+          seats[a.seat].stack += total; seats[a.seat].last = null;
+          return { seats, pot: 0, currentBet: 0, phase: "showdown", winner: a.seat, show3d: true, toAct: null,
+            banner: { title: "You win", sub: a.hand + " \u00B7 " + this.fmt(total) },
+            message: a.hand + " beats " + a.opp };
+        });
+        break;
+    }
+  }
+
+  enterAwait() {
+    const s = this.state;
+    const you = s.seats[0];
+    const callTo = s.currentBet;
+    const callAmt = Math.max(0, callTo - you.committed);
+    const maxTotal = you.stack + you.committed;
+    const oppCaps = s.seats.filter((o) => o.seat !== 0 && o.inHand && !o.folded).map((o) => o.stack + o.committed);
+    const oppMax = Math.max(callTo, ...(oppCaps.length ? oppCaps : [callTo]));
+    const effMax = Math.min(maxTotal, oppMax);
+    const minRaiseTo = callTo > 0 ? callTo * 2 : s.bigBlind * 2;
+    const canRaise = effMax >= minRaiseTo && effMax > callTo;
+    this._ctx = { callTo, callAmt, maxTotal, effMax, minRaiseTo, canRaise };
+    const bv = Math.min(Math.max(minRaiseTo, callTo + s.bigBlind), effMax);
+    this.setState({ yourTurn: true, betValue: canRaise ? bv : effMax, message: "Your move" });
+    if (s.auto) this.timer = setTimeout(() => this.resolve("call"), 1600);
+  }
+
+  setBet(v) {
+    const c = this._ctx || {};
+    const min = c.minRaiseTo || 0, max = c.effMax == null ? v : c.effMax;
+    this.setState({ betValue: Math.round(Math.min(Math.max(v, min), max)) });
+  }
+
+  resolve(kind) {
+    if (!this.state.yourTurn) return;
+    clearTimeout(this.timer);
+    if (kind === "fold") {
+      this.setState((s) => {
+        const seats = s.seats.map((x) => ({ ...x }));
+        seats[0].folded = true; seats[0].last = "Fold";
+        let total = s.pot;
+        seats.forEach((x) => { total += x.committed; x.committed = 0; });
+        const w = seats.find((x) => x.seat !== 0 && x.inHand && !x.folded) || seats[3];
+        w.stack += total;
+        return { seats, pot: 0, currentBet: 0, yourTurn: false, phase: "showdown", winner: w.seat,
+          banner: { title: "You folded", sub: w.name + " wins " + this.fmt(total) }, message: "You folded." };
+      });
+      return;
+    }
+    if (kind === "call") {
+      this.setState((s) => {
+        const seats = s.seats.map((x) => ({ ...x }));
+        const you = seats[0];
+        const delta = s.currentBet - you.committed;
+        you.committed = s.currentBet; you.stack -= delta;
+        if (you.stack <= 0) { you.stack = 0; you.allIn = true; }
+        you.last = delta === 0 ? "Check" : "Call";
+        return { seats, yourTurn: false, message: "" };
+      }, () => { this.timer = setTimeout(() => this.tick(), 450); });
+    }
+  }
+
+  resolveRaise(target, isAllIn) {
+    if (!this.state.yourTurn) return;
+    clearTimeout(this.timer);
+    const c = this._ctx || {};
+    this.setState((s) => {
+      const seats = s.seats.map((x) => ({ ...x }));
+      const you = seats[0];
+      const max = you.stack + you.committed;
+      let t = Math.min(target, max);
+      if (!isAllIn) t = Math.max(t, c.minRaiseTo || t);
+      t = Math.min(t, max);
+      you.stack = max - t; you.committed = t;
+      if (you.stack <= 0) { you.stack = 0; you.allIn = true; }
+      you.last = (isAllIn || you.allIn) ? "All-in" : "Raise";
+      seats.forEach((o) => {
+        if (o.seat !== 0 && o.inHand && !o.folded) {
+          const omax = o.stack + o.committed;
+          const oc = Math.min(t, omax);
+          o.stack = omax - oc; o.committed = oc;
+          if (o.stack <= 0) { o.stack = 0; o.allIn = true; }
+          o.last = o.allIn ? "All-in" : "Call";
+        }
+      });
+      return { seats, currentBet: t, yourTurn: false, message: "" };
+    }, () => {
+      let j = this.si;
+      while (j < this.SCRIPT.length && this.SCRIPT[j].k !== "collect") j++;
+      this.si = j;
+      this.timer = setTimeout(() => this.tick(), 550);
+    });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const fmt = (n) => this.fmt(n);
+
+    const seats = st.seats.map((s) => {
+      const showHand = s.inHand && !s.folded;
+      const faceDown = !(s.isYou || s.revealed);
+      const use3d = s.isYou && st.show3d;
+      const cards = (s.cards || ["?", "?"]).map((code) => {
+        const cc = this.card(code, faceDown);
+        return { rankText: cc.rankText, suit: cc.suit, faceDown };
+      });
+      const active = st.toAct === s.seat && !s.folded && st.phase !== "showdown" && !st.banner;
+      const winner = st.winner === s.seat;
+      const glow = active
+        ? "0 0 0 2px #b03a48, 0 0 22px rgba(143,29,44,0.55)"
+        : (winner ? "0 0 0 2px #d66a76, 0 0 26px rgba(176,58,72,0.7)" : "none");
+      return {
+        seat: s.seat, isYou: !!s.isYou, dealer: !!s.dealer,
+        dx: s.dx, dy: s.dy, mx: s.mx, my: s.my,
+        betDX: s.dx + (50 - s.dx) * 0.34, betDY: s.dy + (46 - s.dy) * 0.34,
+        betMX: s.mx + (50 - s.mx) * 0.32, betMY: s.my + (50 - s.my) * 0.32,
+        opacity: s.folded ? 0.4 : 1,
+        showHand, use3d, use2d: !use3d, cards,
+        cardW: s.isYou ? 44 : 30, cardH: s.isYou ? 62 : 42, cardGap: s.isYou ? 6 : 3,
+        cardWM: s.isYou ? 40 : 24, cardHM: s.isYou ? 56 : 34, cardGapM: s.isYou ? 5 : 2,
+        active, ringAnim: s.isYou ? "vt-ringpulse 1.2s ease-in-out infinite" : "vt-deplete 1.05s linear forwards",
+        last: s.last || null, showAction: !!s.last,
+        name: s.isYou ? "You" : s.name,
+        stackText: s.allIn ? "ALL-IN" : fmt(s.stack),
+        stackColor: s.allIn ? "#e7b9c0" : "#e7b9c0",
+        betText: s.committed > 0 ? fmt(s.committed) : null,
+        initials: s.isYou ? "YOU" : s.name.slice(0, 1),
+        avatarBg: s.isYou ? "rgba(143,29,44,0.22)" : "#20242c",
+        avatarBorder: s.isYou ? "#b03a48" : "rgba(255,255,255,0.14)",
+        glow,
+        pillBg: active ? "rgba(143,29,44,0.42)" : (winner ? "rgba(143,29,44,0.3)" : "rgba(12,13,16,0.85)"),
+      };
+    });
+
+    const boardCells = [];
+    for (let i = 0; i < 5; i++) {
+      if (i < st.board.length) {
+        const cc = this.card(st.board[i], false);
+        boardCells.push({ filled: true, empty: false, rankText: cc.rankText, suit: cc.suit });
+      } else {
+        boardCells.push({ filled: false, empty: true });
+      }
+    }
+
+    const order = ["preflop", "flop", "turn", "river", "showdown"];
+    const ci = order.indexOf(st.phase);
+    const phases = [["Preflop"], ["Flop"], ["Turn"], ["River"], ["Showdown"]].map((p, i) => {
+      const on = ci >= 0 && i <= ci;
+      return { label: p[0], color: on ? "#f0d4d8" : "#6b727c", bg: on ? "rgba(143,29,44,0.22)" : "transparent", bc: on ? "rgba(176,58,72,0.45)" : "rgba(255,255,255,0.08)" };
+    });
+
+    let act = { show: false };
+    let statusShow = true;
+    if (st.yourTurn) {
+      const c = this._ctx || {};
+      const you = st.seats[0];
+      const callAmt = Math.max(0, st.currentBet - you.committed);
+      const isCheck = callAmt === 0;
+      const potNow = st.pot + st.seats.reduce((a, x) => a + x.committed, 0);
+      const clamp = (v) => Math.round(Math.min(Math.max(v, c.minRaiseTo), c.effMax));
+      let raw = [];
+      if (st.phase === "preflop") {
+        raw = [["2.5\u00D7", st.currentBet * 2.5], ["3\u00D7", st.currentBet * 3], ["Pot", you.committed + callAmt + (potNow + callAmt)]];
+      } else {
+        raw = [["\u00BD", you.committed + callAmt + 0.5 * (potNow + callAmt)], ["\u00BE", you.committed + callAmt + 0.75 * (potNow + callAmt)], ["Pot", you.committed + callAmt + (potNow + callAmt)]];
+      }
+      const presets = [];
+      if (c.canRaise) {
+        const seen = new Set();
+        raw.forEach(([label, v]) => {
+          const val = clamp(v);
+          if (!seen.has(val)) { seen.add(val); presets.push({ label, onClick: ((x) => () => this.setBet(x))(val) }); }
+        });
+        presets.push({ label: "Max", onClick: () => this.setBet(c.effMax) });
+      }
+      act = {
+        show: true,
+        callLabel: isCheck ? "Check" : "Call " + fmt(callAmt),
+        canRaise: !!c.canRaise,
+        raiseLabel: "Raise to " + fmt(st.betValue),
+        showAllIn: c.canRaise && c.effMax > st.currentBet,
+        showAllInOnly: !c.canRaise && c.effMax > st.currentBet,
+        allInLabel: "All-in",
+        betText: fmt(st.betValue),
+        betValue: st.betValue, min: c.minRaiseTo, max: c.effMax, step: st.bigBlind,
+        presets,
+        onBet: (e) => this.setBet(+e.target.value),
+        fold: () => this.resolve("fold"),
+        callDo: () => this.resolve("call"),
+        raiseDo: () => this.resolveRaise(st.betValue, false),
+        allInDo: () => this.resolveRaise(c.effMax, true),
+      };
+      statusShow = false;
+    }
+
+    const balance = st.seats[0] ? st.seats[0].stack : 2480;
+
+    return {
+      tableName: this.props.tableName || "Ivory Room",
+      blinds: this.props.blinds || "5 / 10",
+      balanceText: fmt(balance),
+      dealLabel: st.started ? "Deal new hand" : "Deal hand",
+      deal: this.deal,
+      toggleAuto: this.toggleAuto,
+      autoLabel: st.auto ? "ON" : "OFF",
+      autoColor: st.auto ? "#f0d4d8" : "#9aa1ab",
+      autoBg: st.auto ? "rgba(143,29,44,0.18)" : "rgba(255,255,255,0.04)",
+      autoBorder: st.auto ? "rgba(176,58,72,0.45)" : "rgba(255,255,255,0.12)",
+      message: st.message,
+      banner: st.banner,
+      phases, seats, boardCells,
+      showPot: st.pot > 0,
+      potText: fmt(st.pot),
+      act, statusShow,
+      status: st.message || "Waiting for the next hand\u2026",
+    };
+  }
+}
+</script>
+</body>
+</html>

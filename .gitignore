@@ -1,0 +1,48 @@
+# Dependencies and generated builds
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.hot-wallet-secret.txt
+wallets.local.txt
+.treasury.tmp
+.treasury-secret.txt
+
+# Logs and local runtime output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+anchor-validation.out.txt
+
+# Local databases
+*.db
+*.db-journal
+
+# Editor, deployment, and agent state
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.vercel/
+.railway/
+.railway-config-pull-*
+.agents/
+.claude/
+.codex/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~

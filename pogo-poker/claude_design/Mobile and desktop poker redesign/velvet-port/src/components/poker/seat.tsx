@@ -1,0 +1,161 @@
+import { cn, initials } from "@/lib/utils";
+import { formatAmount } from "@/lib/ledger/money";
+import type { Asset } from "@/lib/ledger/money";
+import type { WireSeat } from "@/lib/realtime/events";
+import { PlayingCard } from "./playing-card";
+import type { Card } from "@/lib/poker/types";
+
+/**
+ * A player position on the rim of the oval table — a tactile pod with a circular
+ * avatar, a depleting timer ring for the seat to act, the dealer button, a
+ * name/stack pill, and the player's cards tucked above. Live bets are rendered
+ * separately as chips on the felt by the table view.
+ */
+export function Seat({
+  seat,
+  asset,
+  isDealer,
+  isToAct,
+  isYou,
+  holeCards,
+  clock,
+}: {
+  seat: WireSeat;
+  asset: Asset;
+  isDealer: boolean;
+  isToAct: boolean;
+  isYou: boolean;
+  holeCards?: Card[] | null;
+  /** Live action clock for the seat to act; null for every other seat. */
+  clock?: { secondsLeft: number; fraction: number } | null;
+}) {
+  if (!seat.playerId) {
+    return (
+      <div className="grid h-11 w-11 place-items-center rounded-full border border-dashed border-white/12 text-[10px] text-ash/40">
+        {seat.seat + 1}
+      </div>
+    );
+  }
+
+  const urgent = clock != null && clock.secondsLeft <= 5;
+  const revealed = isYou ? holeCards : (seat.holeCards ?? null);
+  const C = 2 * Math.PI * 25; // timer-ring circumference (r = 25)
+
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col items-center transition-opacity duration-300",
+        seat.hasFolded && "opacity-40",
+      )}
+    >
+      {/* Cards — tucked above the avatar, toward the board */}
+      {seat.inHand && (
+        <div
+          className={cn(
+            "relative z-10 mb-[-8px] flex",
+            isYou ? "gap-1.5" : "gap-px",
+          )}
+          style={{ filter: "drop-shadow(0 8px 14px rgba(0,0,0,0.45))" }}
+        >
+          {revealed ? (
+            revealed.map((c) => (
+              <PlayingCard key={c} card={c} size={isYou ? "md" : "sm"} />
+            ))
+          ) : (
+            <>
+              <PlayingCard size="sm" faceDown />
+              <PlayingCard size="sm" faceDown />
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Avatar with timer ring + dealer button */}
+      <div className="relative">
+        {isToAct && clock && (
+          <svg
+            viewBox="0 0 56 56"
+            className="absolute left-1/2 top-1/2 h-[60px] w-[60px] -translate-x-1/2 -translate-y-1/2 -rotate-90"
+            style={{ overflow: "visible" }}
+          >
+            <circle
+              cx="28"
+              cy="28"
+              r="25"
+              fill="none"
+              stroke="rgba(0,0,0,0.4)"
+              strokeWidth="3"
+            />
+            <circle
+              cx="28"
+              cy="28"
+              r="25"
+              fill="none"
+              strokeWidth="3"
+              strokeLinecap="round"
+              stroke={urgent ? "#f87171" : "#d66a76"}
+              strokeDasharray={C}
+              strokeDashoffset={C * (1 - clock.fraction)}
+              style={{ transition: "stroke-dashoffset 0.25s linear" }}
+            />
+          </svg>
+        )}
+        <div
+          className={cn(
+            "grid h-12 w-12 place-items-center rounded-full border-2 text-[13px] font-semibold tracking-wide transition-shadow",
+            isYou
+              ? "border-velvet bg-velvet/20 text-ivory"
+              : "border-white/15 bg-charcoal-700 text-ivory",
+          )}
+          style={
+            isToAct
+              ? {
+                  boxShadow: urgent
+                    ? "0 0 0 2px #f87171, 0 0 22px rgba(248,113,113,0.5)"
+                    : "0 0 0 2px #b03a48, 0 0 22px rgba(143,29,44,0.55)",
+                }
+              : undefined
+          }
+        >
+          {isYou ? "YOU" : initials(seat.displayName)}
+        </div>
+        {isDealer && (
+          <span className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-ivory text-[10px] font-bold text-charcoal-900 ring-2 ring-charcoal-900">
+            D
+          </span>
+        )}
+      </div>
+
+      {/* Name + stack pill */}
+      <div
+        className={cn(
+          "-mt-1.5 min-w-[3.75rem] max-w-[7rem] rounded-full px-2.5 py-0.5 text-center shadow-sm",
+          isToAct ? "bg-velvet/40" : "bg-charcoal-900/85",
+        )}
+        style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+      >
+        <p className="truncate text-[11px] leading-tight text-ivory-muted">
+          {isYou ? "You" : (seat.displayName ?? "Player")}
+        </p>
+        <p
+          className="font-mono text-[11px] leading-tight"
+          style={{ color: seat.isAllIn ? "#e7b9c0" : "#e7b9c0" }}
+        >
+          {seat.isAllIn ? "ALL-IN" : formatAmount(asset, BigInt(seat.stack))}
+        </p>
+      </div>
+
+      {seat.hasFolded ? (
+        <span className="mt-1 rounded-md border border-white/8 bg-charcoal-900/85 px-1.5 py-px text-[9px] uppercase tracking-[0.13em] text-ash/80">
+          Fold
+        </span>
+      ) : (
+        !seat.inHand && (
+          <span className="mt-0.5 text-[9px] uppercase tracking-wide text-ash/50">
+            {seat.sittingOut ? "Sitting out" : "Waiting"}
+          </span>
+        )
+      )}
+    </div>
+  );
+}

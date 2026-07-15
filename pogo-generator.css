@@ -1,0 +1,523 @@
+/* ===== BUILD-A-POGO — pond sticker booth =====
+   Bright cartoon layer over the dark site chrome. Cream sticker cards with
+   thick ink outlines + hard offset shadows, echoing Pogo's hand-drawn line art. */
+
+:root {
+    --pg-ink: #1d2a0f;
+    --pg-cream: #fffdf0;
+    --pg-cream-dim: #f4f0d8;
+    --pg-lime: #dcfd52;
+    --pg-leaf: #22c55e;
+    --pg-leaf-deep: #15803d;
+    --pg-gold: #fbbf24;
+    --pg-pond: #45c8f2;
+    --pg-shadow: 0 6px 0 rgba(29, 42, 15, 0.85);
+}
+
+/* --- Frame --- */
+.pogo-gen {
+    display: grid;
+    grid-template-columns: minmax(300px, 430px) minmax(0, 1fr);
+    align-items: start;
+    gap: 28px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 18px 48px;
+    font-family: var(--font-display, 'Fredoka', sans-serif);
+    color: var(--pg-ink);
+}
+
+.pg-card {
+    background: var(--pg-cream);
+    border: 4px solid var(--pg-ink);
+    border-radius: 22px;
+    box-shadow: var(--pg-shadow);
+}
+
+/* --- Stage (left) --- */
+.pg-stage {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: sticky;
+    top: 16px;
+}
+
+.pg-stage-card {
+    padding: 18px 18px 20px;
+    transform: rotate(-0.6deg);
+}
+
+.pg-stage-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.pg-title {
+    font-family: 'Bungee', var(--font-display, 'Fredoka'), sans-serif;
+    font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+    letter-spacing: 0.01em;
+    color: var(--pg-ink);
+    text-shadow: 3px 3px 0 var(--pg-lime);
+    margin: 0;
+}
+
+.pg-subtitle {
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--pg-leaf-deep);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.pg-canvas-wrap {
+    position: relative;
+    border: 4px solid var(--pg-ink);
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--pg-lime) 0%, #eaffa3 58%, var(--pg-pond) 100%);
+}
+
+.pg-canvas-wrap canvas {
+    display: block;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    cursor: pointer;
+}
+
+/* neutralize dark-theme text rules from styles.css inside the booth */
+.pogo-gen .item-name,
+.pogo-gen .order-item .item-name,
+.pogo-gen .menu-item .item-name {
+    color: var(--pg-ink) !important;
+    text-shadow: none !important;
+}
+
+.pogo-gen .order-item .item-price {
+    color: var(--pg-leaf-deep) !important;
+    text-shadow: none !important;
+}
+
+.pogo-gen .order-item .item-qty {
+    color: var(--pg-ink) !important;
+    text-shadow: none !important;
+}
+
+/* wooden log strip under Pogo's feet, like the mock-up */
+.pg-log-strip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 14px;
+    background: repeating-linear-gradient(
+        90deg,
+        #8a5a2b 0 42px,
+        #7a4e24 42px 84px
+    );
+    border-top: 4px solid var(--pg-ink);
+    pointer-events: none;
+}
+
+.pg-actions {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 0.9fr;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.pg-btn {
+    font-family: var(--font-display, 'Fredoka', sans-serif);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 12px 10px;
+    border: 3px solid var(--pg-ink);
+    border-radius: 14px;
+    box-shadow: 0 5px 0 var(--pg-ink);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    color: var(--pg-ink);
+}
+
+.pg-btn:hover { transform: translateY(-1px); }
+.pg-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--pg-ink); }
+.pg-btn:focus-visible { outline: 3px dashed var(--pg-leaf-deep); outline-offset: 3px; }
+
+.pg-btn-leaf { background: var(--pg-leaf); color: #ffffff; text-shadow: 1px 1px 0 var(--pg-leaf-deep); }
+.pg-btn-gold { background: var(--pg-gold); }
+.pg-btn-ghost { background: var(--pg-cream-dim); }
+
+/* --- Receipt --- */
+.pg-receipt {
+    padding: 14px 16px 16px;
+    transform: rotate(0.5deg);
+    background:
+        linear-gradient(0deg, rgba(69, 200, 242, 0.08), rgba(69, 200, 242, 0.08)),
+        var(--pg-cream);
+}
+
+.pg-receipt-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 3px dashed var(--pg-ink);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+
+.pg-receipt-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.pg-receipt-note {
+    font-size: 0.66rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--pg-leaf-deep);
+}
+
+.pogo-gen .order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.85rem;
+    min-height: 20px;
+}
+
+.pogo-gen .order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.pogo-gen .order-item-left {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start !important;
+    flex: 1;
+    min-width: 0;
+    text-align: left !important;
+}
+
+.pogo-gen .order-item-left .item-name {
+    flex: 0 1 auto !important;
+    text-align: left !important;
+    margin: 0 !important;
+}
+
+.pogo-gen .order-item .item-qty {
+    font-weight: 700;
+    font-size: 0.7rem;
+    background: var(--pg-lime);
+    border: 2px solid var(--pg-ink);
+    border-radius: 6px;
+    padding: 0 5px;
+    line-height: 1.4;
+}
+
+.pogo-gen .order-item .item-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pogo-gen .order-item .item-price {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--pg-leaf-deep);
+}
+
+.pogo-gen .order-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-top: 3px dashed var(--pg-ink);
+    margin-top: 8px;
+    padding: 8px 0 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+}
+
+.pg-total-label {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.8rem;
+}
+
+.pogo-gen .total-amount {
+    font-weight: 700;
+    font-size: 1.1rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--pg-leaf-deep);
+}
+
+/* --- Picker (right) --- */
+.pg-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+}
+
+.pg-group { padding: 16px 18px 18px; }
+.pg-group:nth-child(odd) { transform: rotate(0.35deg); }
+.pg-group:nth-child(even) { transform: rotate(-0.35deg); }
+
+.pg-group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.pg-group-head h3 {
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0;
+}
+
+.pg-group-count {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--pg-leaf-deep);
+}
+
+.pg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+    gap: 10px;
+}
+
+/* sticker chips (script.js renders .menu-item nodes into the grid) */
+.pogo-gen .menu-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 3px solid var(--pg-ink);
+    border-radius: 16px;
+    padding: 8px 6px 7px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(29, 42, 15, 0.7);
+    transition: transform 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pogo-gen .menu-item:hover {
+    transform: translateY(-2px) rotate(-1.2deg);
+    background: #fbffe8;
+}
+
+.pogo-gen .menu-item:focus-visible {
+    outline: 3px dashed var(--pg-leaf-deep);
+    outline-offset: 2px;
+}
+
+.pogo-gen .menu-item .item-image {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+    line-height: 1;
+}
+
+.pogo-gen .menu-item .item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: auto;
+}
+
+.pogo-gen .menu-item .item-name {
+    font-weight: 600;
+    font-size: 0.68rem;
+    line-height: 1.15;
+    color: var(--pg-ink);
+}
+
+.pogo-gen .menu-item.selected {
+    background: var(--pg-lime);
+    border-color: var(--pg-leaf-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 0 var(--pg-leaf-deep);
+}
+
+.pogo-gen .menu-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: -9px;
+    right: -7px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pg-leaf);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border: 3px solid var(--pg-ink);
+    border-radius: 50%;
+}
+
+/* --- Combos --- */
+.pg-combos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pg-combo {
+    font-family: var(--font-display, 'Fredoka', sans-serif);
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 9px 16px;
+    background: #ffffff;
+    color: var(--pg-ink);
+    border: 3px solid var(--pg-ink);
+    border-radius: 999px;
+    box-shadow: 0 4px 0 rgba(29, 42, 15, 0.7);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+}
+
+.pg-combo:hover { transform: translateY(-1px); background: #fbffe8; }
+.pg-combo:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(29, 42, 15, 0.7); }
+.pg-combo:focus-visible { outline: 3px dashed var(--pg-leaf-deep); outline-offset: 2px; }
+
+.pg-combo-wild {
+    background: var(--pg-gold);
+    border-style: dashed;
+}
+
+/* --- Pond info --- */
+.pg-pond-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+}
+
+.pg-contract {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--pg-cream-dim);
+    border: 3px solid var(--pg-ink);
+    border-radius: 12px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 3px 0 rgba(29, 42, 15, 0.7);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    min-width: 0;
+}
+
+.pg-contract:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(29, 42, 15, 0.7); }
+
+.pg-contract .contract-address {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--pg-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pg-copy-hint {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--pg-leaf-deep);
+    flex-shrink: 0;
+}
+
+.pg-socials {
+    display: flex;
+    gap: 8px;
+}
+
+.pg-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: #ffffff;
+    color: var(--pg-ink);
+    border: 3px solid var(--pg-ink);
+    border-radius: 50%;
+    box-shadow: 0 3px 0 rgba(29, 42, 15, 0.7);
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.08s ease, box-shadow 0.08s ease;
+}
+
+.pg-social img { filter: brightness(0); }
+
+.pg-social:hover { transform: translateY(-2px) rotate(-4deg); background: var(--pg-lime); }
+.pg-social:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(29, 42, 15, 0.7); }
+
+/* --- Mobile --- */
+@media (max-width: 900px) {
+    .pogo-gen {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 18px 12px 40px;
+    }
+
+    .pg-stage { position: static; }
+    .pg-stage-card { max-width: 420px; margin: 0 auto; width: 100%; }
+    .pg-receipt { max-width: 420px; margin: 0 auto; width: 100%; }
+
+    .pg-grid { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
+
+    .pg-actions { grid-template-columns: 1fr 1fr 1fr; }
+    .pg-btn { font-size: 0.8rem; padding: 11px 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pg-btn, .pg-combo, .pg-social, .pogo-gen .menu-item, .pg-contract {
+        transition: none;
+    }
+}

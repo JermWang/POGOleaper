@@ -1,0 +1,1109 @@
+/* Premium Pond Arcade — selected design direction */
+:root {
+    --premium-navy: #0b1728;
+    --premium-ink: #16210f;
+    --premium-cream: #fffdf1;
+    --premium-cream-muted: #f2efd9;
+    --premium-lime: #d9fb4b;
+    --premium-lime-soft: #ebff9f;
+    --premium-green: #159447;
+    --premium-green-dark: #0c6d35;
+    --premium-gold: #ffc52f;
+    --premium-pond: #43c8e6;
+    --premium-border: 3px solid var(--premium-ink);
+    --premium-shadow: 0 5px 0 rgba(22, 33, 15, 0.82);
+}
+
+body {
+    background: #d9fb4b url('bg 2048.png') center top / cover fixed no-repeat;
+    animation: none;
+    color: var(--premium-ink);
+}
+
+/* Header */
+.restaurant-header {
+    min-height: 82px;
+    height: auto;
+    padding: 10px clamp(16px, 3vw, 42px);
+    gap: 24px;
+    background: var(--premium-navy);
+    border: 0;
+    box-shadow: 0 3px 0 var(--premium-gold), 0 10px 28px rgba(3, 11, 22, 0.22);
+    backdrop-filter: none;
+    position: relative;
+    z-index: 20;
+}
+
+.restaurant-header::before,
+.restaurant-header::after {
+    display: none;
+}
+
+.restaurant-logo {
+    min-width: 260px;
+    gap: 12px;
+}
+
+.header-logo {
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--premium-gold);
+    box-shadow: none;
+    filter: none;
+}
+
+.palace-title {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(1.05rem, 1.7vw, 1.45rem);
+    letter-spacing: 0.01em;
+    color: var(--premium-gold);
+    text-shadow: none;
+}
+
+.palace-tagline {
+    margin-top: 5px;
+    color: #f8f8ed;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.restaurant-stats {
+    display: none;
+}
+
+.restaurant-hours {
+    flex: 0 0 auto;
+}
+
+.restaurant-hours .abstract-text {
+    color: #52d879;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+}
+
+.header-app-nav.tab-navigation {
+    display: flex;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+    width: auto;
+    max-width: 680px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+.header-app-nav .tab-button {
+    min-width: 0;
+    flex: 1 1 0;
+    min-height: 50px;
+    padding: 10px 18px;
+    gap: 9px;
+    background: #152338;
+    color: #fffef3;
+    border: 1px solid #263850;
+    border-radius: 12px;
+    box-shadow: none;
+    backdrop-filter: none;
+    font-size: 0.88rem;
+    text-decoration: none;
+}
+
+.header-app-nav .tab-button::before {
+    display: none;
+}
+
+.header-app-nav .tab-button:hover {
+    transform: translateY(-1px);
+    background: #1b2c44;
+    border-color: var(--premium-gold);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.header-app-nav .tab-button.active,
+.header-app-nav .tab-button.active:hover {
+    transform: none;
+    background: var(--premium-green);
+    color: #ffffff;
+    border: 2px solid var(--premium-gold);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+}
+
+.header-app-nav .tab-icon {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+}
+
+.restaurant-container {
+    width: 100%;
+    min-height: calc(100vh - 82px);
+    padding: 0;
+    overflow: visible;
+}
+
+.restaurant-container::before {
+    display: none;
+}
+
+.restaurant-container > .desktop-nav {
+    display: none;
+}
+
+.mobile-app-nav {
+    display: none;
+}
+
+.mobile-menu-overlay:popover-open {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    inset: 0;
+}
+
+.mobile-menu-overlay:popover-open .mobile-menu-content {
+    transform: translateX(0);
+}
+
+/* Generator frame */
+.pogo-gen {
+    display: block;
+    width: min(100%, 1440px);
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: clamp(22px, 3vw, 42px);
+    color: var(--premium-ink);
+}
+
+.pogo-gen .pg-card {
+    background: var(--premium-cream);
+    border: var(--premium-border);
+    border-radius: 22px;
+    box-shadow: var(--premium-shadow);
+}
+
+.pogo-gen .pg-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 24px;
+    position: static;
+    align-items: stretch;
+}
+
+.pogo-gen .pg-stage-card {
+    padding: 20px;
+    transform: none;
+}
+
+.pogo-gen .pg-stage-head {
+    margin: 0 4px 14px;
+}
+
+.pogo-gen .pg-title {
+    font-size: clamp(1.65rem, 3vw, 2.55rem);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-shadow: 4px 4px 0 var(--premium-lime);
+}
+
+.pogo-gen .pg-subtitle {
+    color: var(--premium-green-dark);
+    font-size: 0.72rem;
+    letter-spacing: 0.13em;
+}
+
+.pogo-gen .pg-canvas-wrap {
+    min-height: 0;
+    height: min(41vw, 390px);
+    border: var(--premium-border);
+    border-radius: 16px;
+    background: var(--premium-lime-soft) url('bg 2048.png') center 56% / cover no-repeat;
+    display: grid;
+    place-items: center;
+}
+
+.pogo-gen .pg-canvas-wrap canvas {
+    width: 100% !important;
+    height: 390px !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: contain;
+    background: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.pogo-gen .pg-log-strip {
+    display: none;
+}
+
+/* Selected look */
+.pogo-gen .pg-receipt {
+    padding: 22px 18px 18px;
+    transform: none;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    background: var(--premium-cream);
+}
+
+.pogo-gen .pg-receipt-head {
+    display: block;
+    padding: 0;
+    margin: 0 0 16px;
+    border: 0;
+}
+
+.pogo-gen .pg-receipt-title {
+    display: block;
+    font-family: 'Bungee', 'Fredoka', sans-serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+}
+
+.pogo-gen .pg-receipt-note {
+    display: block;
+    margin-top: 4px;
+    color: #63704e;
+    font-size: 0.68rem;
+}
+
+.pogo-gen .order-items {
+    display: grid;
+    gap: 14px;
+    min-height: 0;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+}
+
+.selected-trait {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background: #fffef8;
+    border: 2px solid #8b8c71;
+    border-radius: 15px;
+}
+
+.selected-trait-thumb {
+    width: 76px;
+    height: 76px;
+    display: grid;
+    place-items: center;
+    background: var(--premium-cream-muted);
+    border: 2px solid #8b8c71;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.selected-trait-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.selected-trait-copy {
+    min-width: 0;
+}
+
+.selected-trait-copy span {
+    display: block;
+    color: #687143;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.selected-trait-copy strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.92rem;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.pg-selected-actions {
+    margin-top: auto;
+    padding-top: 18px;
+}
+
+.pg-selected-actions .pg-btn {
+    width: 100%;
+}
+
+/* Accessory trays */
+.pogo-gen .pg-picker {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.pogo-gen .pg-group {
+    grid-column: 1 / -1;
+}
+
+.pogo-gen .pg-group {
+    min-width: 0;
+    padding: 8px 12px 9px;
+    transform: none;
+}
+
+.pogo-gen .pg-group-head {
+    margin-bottom: 4px;
+}
+
+.pogo-gen .pg-group-head h3 {
+    font-family: 'Bungee', 'Fredoka', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+}
+
+.pogo-gen .pg-group-count {
+    color: var(--premium-green-dark);
+    font-size: 0.68rem;
+}
+
+.pogo-gen .pg-grid {
+    display: flex;
+    gap: 12px;
+    padding: 2px 3px 7px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-color: var(--premium-green) var(--premium-cream-muted);
+    scrollbar-width: thin;
+}
+
+.pogo-gen .menu-item {
+    flex: 0 0 80px;
+    min-height: 82px;
+    padding: 5px 4px;
+    gap: 7px;
+    scroll-snap-align: start;
+    background: #fffef8;
+    border: 2px solid #696c57;
+    border-radius: 14px;
+    box-shadow: 0 3px 0 rgba(22, 33, 15, 0.62);
+}
+
+.pogo-gen .menu-item:hover {
+    transform: translateY(-2px);
+    background: #ffffff;
+}
+
+.pogo-gen .menu-item .item-image {
+    width: 44px;
+    height: 44px;
+}
+
+.pogo-gen .menu-item .item-name {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.68rem;
+    line-height: 1.12;
+}
+
+.pogo-gen .menu-item.selected {
+    transform: none;
+    background: var(--premium-lime-soft);
+    border: 3px solid var(--premium-green);
+    box-shadow: 0 3px 0 var(--premium-green-dark);
+}
+
+.pogo-gen .menu-item.selected::after {
+    display: none;
+}
+
+/* Utility strip */
+.pogo-gen .pg-utility-bar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 16px;
+}
+
+.pogo-gen .pg-actions {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 10px;
+    margin: 0;
+}
+
+.pogo-gen .pg-btn {
+    min-height: 46px;
+    padding: 10px 18px;
+    border: 3px solid var(--premium-ink);
+    border-radius: 12px;
+    box-shadow: 0 4px 0 var(--premium-ink);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+}
+
+.pogo-gen .pg-btn-leaf {
+    background: var(--premium-green);
+    color: #ffffff;
+    text-shadow: none;
+}
+
+.pogo-gen .pg-btn-gold,
+.pogo-gen .pg-combo-wild {
+    background: var(--premium-gold);
+}
+
+.pogo-gen .pg-btn-ghost {
+    background: var(--premium-cream-muted);
+}
+
+.pogo-gen .pg-combos {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    gap: 9px;
+}
+
+.pogo-gen .pg-combo {
+    min-height: 42px;
+    padding: 8px 14px;
+    border: 2px solid var(--premium-ink);
+    border-radius: 11px;
+    background: #fffef8;
+    box-shadow: 0 3px 0 rgba(22, 33, 15, 0.72);
+    font-size: 0.78rem;
+}
+
+.pogo-gen .pg-combo-wild {
+    margin-left: auto;
+    border: 3px solid var(--premium-ink);
+}
+
+.pogo-gen .pg-pond-info {
+    grid-column: 2;
+    padding: 12px 16px;
+    transform: none;
+    border-width: 2px;
+    box-shadow: 0 3px 0 rgba(22, 33, 15, 0.7);
+}
+
+.pogo-gen .pg-contract,
+.pogo-gen .pg-social {
+    box-shadow: none;
+}
+
+/* Game surface inherits the calmer premium shell */
+#game-panel .game-container {
+    border-radius: 22px;
+    border: var(--premium-border);
+    box-shadow: var(--premium-shadow);
+}
+
+@media (max-width: 1120px) {
+    .restaurant-hours {
+        display: none;
+    }
+
+    .restaurant-logo {
+        min-width: 220px;
+    }
+
+    .pogo-gen .pg-stage {
+        grid-template-columns: minmax(0, 1fr) 250px;
+    }
+
+    .pogo-gen .pg-combos {
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 5px;
+    }
+
+    .pogo-gen .pg-combo {
+        flex: 0 0 auto;
+    }
+
+    .pogo-gen .pg-picker {
+        grid-template-columns: 1fr;
+    }
+
+    .pogo-gen .pg-group,
+    .pogo-gen .pg-pond-info {
+        grid-column: 1;
+    }
+}
+
+@media (max-width: 820px) {
+    .restaurant-header {
+        min-height: 68px;
+        padding: 8px 14px;
+    }
+
+    .restaurant-logo {
+        min-width: 0;
+    }
+
+    .header-logo {
+        width: 48px;
+        height: 48px;
+    }
+
+    .palace-title {
+        font-size: 1rem;
+    }
+
+    .palace-tagline {
+        font-size: 0.62rem;
+    }
+
+    .header-app-nav {
+        display: none !important;
+    }
+
+    .mobile-menu-button {
+        display: none !important;
+    }
+
+    .mobile-app-nav {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+        padding: 9px 12px 10px;
+        background: var(--premium-navy);
+        border-bottom: 2px solid var(--premium-gold);
+    }
+
+    .mobile-app-nav .tab-button {
+        min-width: 0;
+        min-height: 42px;
+        padding: 8px 6px;
+        border-radius: 9px;
+        border: 1px solid #2e3d52;
+        background: #152338;
+        color: #fffef3;
+        box-shadow: none;
+        font-size: 0.72rem;
+        text-decoration: none;
+    }
+
+    .mobile-app-nav .tab-button.active {
+        transform: none;
+        background: var(--premium-green);
+        border-color: var(--premium-gold);
+        box-shadow: none;
+    }
+
+    .pogo-gen {
+        padding: 18px 12px 34px;
+    }
+
+    .pogo-gen .pg-stage {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .pogo-gen .pg-stage-card,
+    .pogo-gen .pg-receipt {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+
+    .pogo-gen .pg-canvas-wrap {
+        min-height: 0;
+        height: auto;
+        aspect-ratio: 1.24 / 1;
+    }
+
+    .pogo-gen .pg-canvas-wrap canvas {
+        width: 100% !important;
+        height: calc((100vw - 50px) / 1.24) !important;
+        object-fit: contain;
+        transform: none !important;
+    }
+
+    .pogo-gen .pg-receipt {
+        min-height: 0;
+    }
+
+    .pogo-gen .order-items {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .selected-trait {
+        grid-template-columns: 58px minmax(0, 1fr);
+        padding: 9px;
+    }
+
+    .selected-trait-thumb {
+        width: 58px;
+        height: 58px;
+    }
+
+    .pg-selected-actions {
+        margin-top: 14px;
+        padding-top: 0;
+    }
+
+    .pogo-gen .pg-utility-bar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .pogo-gen .pg-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pogo-gen .pg-combos {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 520px) {
+    .restaurant-header {
+        position: sticky;
+        top: 0;
+    }
+
+    .restaurant-name {
+        max-width: 215px;
+    }
+
+    .pogo-gen .pg-stage-card {
+        padding: 13px;
+    }
+
+    .pogo-gen .pg-stage-head {
+        display: block;
+    }
+
+    .pogo-gen .pg-subtitle {
+        margin-top: 7px;
+    }
+
+    .pogo-gen .pg-title {
+        font-size: 1.55rem;
+    }
+
+    .pogo-gen .pg-group {
+        padding: 14px 12px 15px;
+    }
+
+    .pogo-gen .pg-grid {
+        gap: 10px;
+    }
+
+    .pogo-gen .menu-item {
+        flex-basis: 96px;
+        min-height: 108px;
+    }
+
+    .pogo-gen .menu-item .item-image {
+        width: 62px;
+        height: 62px;
+    }
+
+    .pogo-gen .order-items {
+        grid-template-columns: 1fr;
+    }
+
+    .pogo-gen .pg-pond-info {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .pogo-gen .pg-contract {
+        width: 100%;
+    }
+
+    .pogo-gen .pg-socials {
+        justify-content: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .jump-animation {
+        animation: none;
+    }
+}
+
+/* Pogo Leap — premium arcade cabinet */
+#game-panel {
+    padding: clamp(18px, 4vw, 46px) 16px 58px;
+}
+
+#game-panel .game-container {
+    width: min(930px, 100%);
+    max-width: 930px;
+    margin: 0 auto;
+    overflow: hidden;
+    color: var(--premium-ink);
+    background: var(--premium-cream);
+    border: var(--premium-border);
+    border-radius: 24px;
+    box-shadow: 0 9px 0 rgba(22, 33, 15, 0.82), 0 24px 60px rgba(11, 23, 40, 0.18);
+}
+
+#game-panel .game-container::before {
+    display: none;
+}
+
+#game-panel .game-header {
+    min-height: 100px;
+    padding: 20px clamp(20px, 4vw, 36px);
+    color: var(--premium-ink);
+    background: #f7f3dd;
+    border-bottom: 3px solid var(--premium-ink);
+    backdrop-filter: none;
+}
+
+#game-panel .game-kicker,
+#game-panel .game-command-label,
+#game-panel .game-start-kicker {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--premium-green-dark);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+#game-panel .game-title-section h2 {
+    margin: 0;
+    color: var(--premium-ink);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    font-size: clamp(1.7rem, 3.5vw, 2.35rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+#game-panel .game-subtitle {
+    margin-top: 7px;
+    color: #526047;
+    font-size: 0.9rem;
+}
+
+#game-panel .game-stats {
+    gap: 10px;
+}
+
+#game-panel .stat-box {
+    min-width: 72px;
+    padding: 9px 12px;
+    background: #fffef8;
+    border: 2px solid var(--premium-ink);
+    border-radius: 12px;
+    box-shadow: 0 3px 0 rgba(22, 33, 15, 0.72);
+}
+
+#game-panel .stat-value {
+    color: var(--premium-green-dark);
+    font-size: 1.25rem;
+    text-shadow: none;
+}
+
+#game-panel .stat-label {
+    color: #657057;
+    font-size: 0.64rem;
+}
+
+#game-panel .game-play-area {
+    display: grid;
+    grid-template-columns: minmax(320px, 430px) minmax(260px, 1fr);
+    gap: clamp(22px, 4vw, 46px);
+    align-items: center;
+    padding: clamp(22px, 4vw, 42px);
+}
+
+#game-panel .game-canvas-container {
+    width: 100%;
+    min-height: 560px;
+    margin: 0;
+    background: var(--premium-navy);
+    border: 3px solid var(--premium-ink);
+    border-radius: 18px;
+    box-shadow: 0 6px 0 rgba(22, 33, 15, 0.78);
+    overflow: hidden;
+}
+
+#game-panel #gameCanvas {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 560px;
+    max-width: none;
+    max-height: 640px;
+    border-radius: 14px;
+    object-fit: cover;
+}
+
+#game-panel .game-command-panel {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+#game-panel .game-command-copy h3 {
+    margin: 0 0 12px;
+    color: var(--premium-ink);
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(1.75rem, 4vw, 2.7rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+}
+
+#game-panel .game-command-copy p {
+    margin: 0;
+    color: #536048;
+    font-size: 0.96rem;
+    line-height: 1.55;
+}
+
+#game-panel .game-control-guide {
+    display: grid;
+    gap: 10px;
+    margin: 28px 0;
+}
+
+#game-panel .game-control-guide > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 11px 0;
+    border-bottom: 2px solid #d9d8c5;
+}
+
+#game-panel .game-control-guide dt,
+#game-panel .game-control-guide dd {
+    margin: 0;
+    font-size: 0.82rem;
+}
+
+#game-panel .game-control-guide dt {
+    color: #67715c;
+    font-weight: 600;
+}
+
+#game-panel .game-control-guide dd {
+    color: var(--premium-ink);
+    font-weight: 700;
+    text-align: right;
+}
+
+#game-panel .game-controls {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+    background: transparent;
+    backdrop-filter: none;
+}
+
+#game-panel .game-btn {
+    width: 100%;
+    max-width: none;
+    min-height: 48px;
+    padding: 12px 18px;
+    border: 2px solid var(--premium-ink);
+    border-radius: 11px;
+    box-shadow: 0 4px 0 rgba(22, 33, 15, 0.82);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.83rem;
+    letter-spacing: 0.03em;
+}
+
+#game-panel .game-btn::before {
+    display: none;
+}
+
+#game-panel .game-btn.primary {
+    background: var(--premium-green);
+    color: white;
+}
+
+#game-panel .game-btn.secondary {
+    background: var(--premium-gold);
+    color: var(--premium-ink);
+}
+
+#game-panel .game-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 rgba(22, 33, 15, 0.82);
+}
+
+#game-panel .mobile-instructions {
+    display: none;
+}
+
+#game-panel .game-overlay {
+    padding: 18px;
+    background: rgba(11, 23, 40, 0.88);
+    backdrop-filter: blur(8px);
+}
+
+#game-panel .overlay-content {
+    width: min(320px, 94%);
+    max-width: 320px;
+    padding: 0;
+    overflow: visible;
+    color: var(--premium-ink);
+    background: transparent;
+    border: 0;
+    backdrop-filter: none;
+}
+
+#game-panel .game-start-card {
+    padding: 24px 22px 22px;
+    text-align: center;
+    background: var(--premium-cream);
+    border: 3px solid var(--premium-ink);
+    border-radius: 16px;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.34);
+}
+
+#game-panel .game-start-image {
+    width: 70px;
+    height: 70px;
+    margin: -52px auto 8px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 5px 0 rgba(22, 33, 15, 0.28));
+}
+
+#game-panel .game-start-card h1 {
+    margin: 0 0 10px;
+    color: var(--premium-ink);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.85rem;
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+#game-panel .game-start-card p {
+    margin: 0 0 18px;
+    color: #55604c;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+#game-panel .game-start-button {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+    color: white;
+    background: var(--premium-green);
+    border: 2px solid var(--premium-ink);
+    border-radius: 10px;
+    box-shadow: 0 4px 0 rgba(22, 33, 15, 0.82);
+    cursor: pointer;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+#game-panel .game-start-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 rgba(22, 33, 15, 0.82);
+}
+
+@media (max-width: 760px) {
+    #game-panel {
+        padding: 14px 10px 36px;
+    }
+
+    #game-panel .game-container {
+        width: 100% !important;
+        border-radius: 18px;
+        align-items: stretch !important;
+    }
+
+    #game-panel .game-header {
+        min-height: 0;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    #game-panel .game-kicker,
+    #game-panel .game-subtitle {
+        display: none;
+    }
+
+    #game-panel .game-title-section h2 {
+        font-size: 1.55rem;
+    }
+
+    #game-panel .stat-box {
+        min-width: 58px;
+        padding: 7px 8px;
+    }
+
+    #game-panel .game-play-area {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 14px;
+    }
+
+    #game-panel .game-canvas-container {
+        width: 100% !important;
+        min-height: 480px !important;
+        max-height: none !important;
+        overflow: hidden !important;
+    }
+
+    #game-panel #gameCanvas {
+        width: 100% !important;
+        height: min(66vh, 560px) !important;
+        min-width: 0 !important;
+        min-height: 480px !important;
+        max-width: none !important;
+        max-height: 560px !important;
+        object-fit: cover !important;
+    }
+
+    #game-panel .game-command-panel {
+        padding: 4px 2px 8px;
+    }
+
+    #game-panel .game-command-copy h3,
+    #game-panel .game-command-copy p,
+    #game-panel .game-control-guide {
+        display: none;
+    }
+
+    #game-panel .game-controls {
+        max-width: none !important;
+    }
+
+    #game-panel .mobile-instructions {
+        display: block;
+        padding: 12px 2px 0;
+        color: #5e6954;
+        text-align: center;
+    }
+
+    #game-panel .mobile-instructions p {
+        margin: 0;
+        font-size: 0.74rem;
+        line-height: 1.4;
+    }
+}

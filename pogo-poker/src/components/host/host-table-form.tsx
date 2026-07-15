@@ -1,0 +1,294 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input, Label, Select } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { ConnectButton } from "@/components/auth/connect-button";
+import { HelpHint } from "@/components/ui/tooltip";
+import { authedFetch } from "@/lib/auth/privy-token";
+
+// Tidy a shorthand decimal on blur so the field shows a clean value
+// (".3" -> "0.3", "3." -> "3"). The server accepts either form regardless.
+function normalizeDecimalField(e: React.FocusEvent<HTMLInputElement>) {
+  let s = e.target.value.trim();
+  if (!s) return;
+  if (s.startsWith(".")) s = `0${s}`;
+  if (s.endsWith(".")) s = s.slice(0, -1);
+  e.target.value = s;
+}
+
+export function HostTableForm({
+  authed,
+  tokenConfigured,
+  tokenSymbol,
+  privateActive,
+  privateMax,
+}: {
+  authed: boolean;
+  tokenConfigured: boolean;
+  tokenSymbol: string;
+  privateActive: number;
+  privateMax: number;
+}) {
+  const router = useRouter();
+  const privateFull = privateActive >= privateMax;
+  const privateLeft = Math.max(0, privateMax - privateActive);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Public tables must use the token; private tables may use ETH/USDC/token.
+  const [visibility, setVisibility] = useState(
+    tokenConfigured ? "PUBLIC" : "PRIVATE",
+  );
+  const [asset, setAsset] = useState(tokenConfigured ? "TOKEN" : "ETH");
+
+  // Asset options allowed for the current visibility.
+  const assetOptions =
+    visibility === "PUBLIC"
+      ? [{ value: "TOKEN", label: tokenSymbol }]
+      : [
+          { value: "ETH", label: "ETH" },
+          { value: "USDC", label: "USDC" },
+          ...(tokenConfigured
+            ? [{ value: "TOKEN", label: tokenSymbol }]
+            : []),
+        ];
+
+  function onVisibilityChange(next: string) {
+    setVisibility(next);
+    // Force a valid asset for the new visibility (public ⇒ token only).
+    if (next === "PUBLIC") setAsset("TOKEN");
+    else if (asset === "TOKEN" && !tokenConfigured) setAsset("ETH");
+  }
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (visibility === "PRIVATE" && privateFull) {
+      setError(
+        `All private tables are full (${privateActive}/${privateMax}). Please wait for one to open up.`,
+      );
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    const payload = {
+      name: String(form.get("name") ?? ""),
+      asset,
+      maxSeats: Number(form.get("maxSeats")),
+      smallBlind: String(form.get("smallBlind") ?? ""),
+      bigBlind: String(form.get("bigBlind") ?? ""),
+      minBuyIn: String(form.get("minBuyIn") ?? ""),
+      maxBuyIn: String(form.get("maxBuyIn") ?? ""),
+      visibility,
+      password: String(form.get("password") ?? "") || undefined,
+      actionTimeoutSeconds: Number(form.get("actionTimeoutSeconds") ?? 30),
+      spectatorsAllowed: form.get("spectatorsAllowed") === "on",
+    };
+
+    let res: Response;
+    try {
+      res = await authedFetch("/api/tables", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      setSubmitting(false);
+      setError("Couldn't reach the server — check your connection and try again.");
+      return;
+    }
+    // Parse defensively: an error response can come back empty / non-JSON, which
+    // must never leave the button stuck on "Creating…".
+    const json = (await res.json().catch(() => null)) as
+      | { id?: string; error?: string }
+      | null;
+    setSubmitting(false);
+    if (!res.ok) {
+      setError(json?.error ?? `Could not create the table (error ${res.status}).`);
+      return;
+    }
+    if (!json?.id) {
+      setError("Table created, but no id came back. Please refresh and check the lobby.");
+      return;
+    }
+    router.push(`/app/tables/${json.id}`);
+  }
+
+  return (
+    <Card>
+      <CardContent className="py-6">
+        <form onSubmit={onSubmit} className="space-y-6">
+          <div>
+            <Label htmlFor="name">Table name</Label>
+            <Input id="name" name="name" placeholder="The Pogo Room" required />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="asset" className="inline-flex items-center gap-1.5">
+                Asset
+                <HelpHint label={`Public tables use ${tokenSymbol} only. Private tables can use ETH, USDC, or ${tokenSymbol}.`} />
+              </Label>
+              <Select
+                id="asset"
+                name="asset"
+                value={asset}
+                onChange={(e) => setAsset(e.target.value)}
+                disabled={visibility === "PUBLIC"}
+              >
+                {assetOptions.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </Select>
+              {visibility === "PUBLIC" && (
+                <p className="mt-1 text-xs text-ash/70">
+                  Public tables are {tokenSymbol}-only.
+                </p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="maxSeats">Table size</Label>
+              <Select id="maxSeats" name="maxSeats" defaultValue="6">
+                <option value="2">Heads-up (2 max)</option>
+                <option value="6">6-max</option>
+                <option value="9">9-max</option>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="smallBlind">Small blind</Label>
+              <Input id="smallBlind" name="smallBlind" placeholder="0.01" inputMode="decimal" onBlur={normalizeDecimalField} required />
+            </div>
+            <div>
+              <Label htmlFor="bigBlind">Big blind</Label>
+              <Input id="bigBlind" name="bigBlind" placeholder="0.02" inputMode="decimal" onBlur={normalizeDecimalField} required />
+            </div>
+            <div>
+              <Label htmlFor="minBuyIn">Min buy-in</Label>
+              <Input id="minBuyIn" name="minBuyIn" placeholder="1" inputMode="decimal" onBlur={normalizeDecimalField} required />
+            </div>
+            <div>
+              <Label htmlFor="maxBuyIn">Max buy-in</Label>
+              <Input id="maxBuyIn" name="maxBuyIn" placeholder="4" inputMode="decimal" onBlur={normalizeDecimalField} required />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="visibility" className="inline-flex items-center gap-1.5">
+                Visibility
+                <HelpHint label="Public tables are listed in the lobby for anyone to join. Private tables are reachable only by invite link or code." />
+              </Label>
+              <Select
+                id="visibility"
+                name="visibility"
+                value={visibility}
+                onChange={(e) => onVisibilityChange(e.target.value)}
+              >
+                <option value="PUBLIC" disabled={!tokenConfigured}>
+                  Public — listed in the lobby{!tokenConfigured ? " (token not set)" : ""}
+                </option>
+                <option value="PRIVATE">Private — invite only</option>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="actionTimeoutSeconds">Action timer (seconds)</Label>
+              <Input
+                id="actionTimeoutSeconds"
+                name="actionTimeoutSeconds"
+                type="number"
+                defaultValue={30}
+                min={10}
+                max={120}
+              />
+            </div>
+          </div>
+
+          {visibility === "PRIVATE" && (
+            <div
+              className={`rounded-xl border p-4 ${
+                privateFull
+                  ? "border-amber-400/30 bg-amber-400/[0.06]"
+                  : "border-white/8 bg-white/[0.02]"
+              }`}
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="uppercase tracking-[0.18em] text-ash/70">
+                  Private tables in play
+                </span>
+                <span className="font-mono text-ivory">
+                  {privateActive}/{privateMax}
+                </span>
+              </div>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/8">
+                <div
+                  className={`h-full rounded-full ${privateFull ? "bg-amber-400" : "bg-pogo"}`}
+                  style={{
+                    width: `${Math.min(100, Math.round((privateActive / Math.max(1, privateMax)) * 100))}%`,
+                  }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-ash">
+                {privateFull
+                  ? "All private tables are full right now. Please wait for one to open up before creating a new game."
+                  : `${privateLeft} slot${privateLeft === 1 ? "" : "s"} open. We cap concurrent private games to keep tables fast and stable.`}
+              </p>
+            </div>
+          )}
+
+          {visibility === "PRIVATE" && (
+            <div>
+              <Label htmlFor="password">Optional password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Leave blank for link-only access"
+              />
+            </div>
+          )}
+
+          <label className="flex items-center gap-2 text-sm text-ash">
+            <input type="checkbox" name="spectatorsAllowed" defaultChecked />
+            Allow spectators
+          </label>
+
+          <div className="rounded-xl border border-white/8 bg-white/[0.02] p-4 text-xs text-ash">
+            As host you set the stakes and seating. You do not control the deck,
+            RNG, payouts, pot logic, balances, or rake — all are enforced by the
+            server.
+          </div>
+
+          {error && <p className="text-sm text-red-300">{error}</p>}
+
+          {authed ? (
+            <Button
+              type="submit"
+              disabled={submitting || (visibility === "PRIVATE" && privateFull)}
+            >
+              {submitting
+                ? "Creating…"
+                : visibility === "PRIVATE" && privateFull
+                  ? "Private tables full — please wait"
+                  : "Create table"}
+            </Button>
+          ) : (
+            <div className="space-y-2">
+              <ConnectButton label="Connect wallet to host" />
+              <p className="text-xs text-ash/70">
+                Set everything up first — you only need to connect to create the
+                table.
+              </p>
+            </div>
+          )}
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

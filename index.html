@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Basic Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- Mobile Web App Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pogo's Leap Pad">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+
+    <!-- Title and Description -->
+    <title>Pogo's Leap Pad | $POGO - Build Your Custom Frog</title>
+    <meta name="description" content="Welcome to Pogo's Leap Pad! The most ribbiting awesome memecoin pond in crypto. Build your Pogo PFP, play Pogo Leap, and pull up a lily pad at Pogo Poker!">
+    <meta name="keywords" content="Pogo, frog, leaper, memecoin, cryptocurrency, PFP generator, custom frog, Pogo Leap, Pogo Poker">
+    <meta name="author" content="Pogo the Leaper">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    
+    <!-- Twitter Configuration -->
+    <meta name="twitter-client-id" content="__TWITTER_CLIENT_ID__">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="POGO-pfp.png">
+    <link rel="shortcut icon" href="POGO-pfp.png">
+    <link rel="apple-touch-icon" href="POGO-pfp.png">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://PogoTheLeaper.com">
+    <meta property="og:title" content="Pogo's Leap Pad">
+    <meta property="og:description" content="POGO THE LEAPER — leap in, the pond's fine!">
+    <meta property="og:image" content="POGO-BANNER.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Pogo's Leap Pad">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://PogoTheLeaper.com">
+    <meta name="twitter:title" content="Pogo's Leap Pad">
+    <meta name="twitter:description" content="Welcome to Pogo's Leap Pad! The most ribbiting awesome memecoin pond in crypto!">
+    <meta name="twitter:image" content="POGO-BANNER.png">
+    <meta name="twitter:creator" content="@PogoTheLeaper">
+    <meta name="twitter:site" content="@PogoTheLeaper">
+    
+
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Bungee:wght@400&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="mobile-fix.css">
+    <link rel="stylesheet" href="pogo-generator.css">
+    <link rel="stylesheet" href="premium-polish.css?v=2">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Pogo's Leap Pad",
+        "alternateName": "$POGO — Pogo the Leaper",
+        "description": "The most ribbiting awesome memecoin pond in crypto",
+        "url": "https://PogoTheLeaper.com",
+        "logo": "https://PogoTheLeaper.com/POGO-THE-LEAPER.png",
+        "sameAs": [
+            "https://x.com/PogoTheLeaper",
+            "https://t.me/pogosleappad"
+        ]
+    }
+    </script>
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#16a34a">
+    <meta name="msapplication-TileColor" content="#16a34a">
+    
+    <!-- Preload Critical Assets -->
+    <link rel="preload" href="POGO-THE-LEAPER.png" as="image" type="image/png">
+    
+
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo-container">
+                <img src="POGO-THE-LEAPER.png" alt="Pogo Loading" class="loading-frog">
+                <div class="loading-rings">
+                    <div class="loading-ring loading-ring-1"></div>
+                    <div class="loading-ring loading-ring-2"></div>
+                    <div class="loading-ring loading-ring-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- Skip to Content (Accessibility) -->
+    <a href="#main-content" class="skip-link">Skip to menu</a>
+
+    <!-- Pond Header -->
+    <header class="restaurant-header">
+        <div class="restaurant-logo">
+            <img src="POGO-THE-LEAPER.png" alt="Pogo's Leap Pad Logo" class="header-logo" onclick="logoClicked()">
+            <div class="restaurant-name">
+                <h1 class="palace-title">POGO'S LEAP PAD</h1>
+                <p class="palace-tagline">PFP Generator</p>
+            </div>
+        </div>
+        <nav class="tab-navigation desktop-nav header-app-nav" role="tablist" aria-label="Pogo apps">
+            <button id="generator-tab" class="tab-button active" data-tab="generator" role="tab" aria-selected="true" aria-controls="generator-panel">
+                <img src="walk.png" alt="" class="tab-icon"> PFP Generator
+            </button>
+            <button id="game-tab" class="tab-button" data-tab="game" role="tab" aria-selected="false" aria-controls="game-panel">
+                <img src="game/token.png" alt="" class="tab-icon jump-animation"> Pogo Leap
+            </button>
+            <a href="/pogo-poker/" class="tab-button pogo-poker-tab" title="Hold'em on Robinhood Chain — pull up a lily pad">
+                <img src="POGO-pfp.png" alt="" class="tab-icon"> Pogo Poker
+            </a>
+        </nav>
+        <div class="restaurant-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="ordersServed">0</div>
+                <div class="stat-label">Frogs Built</div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Ribbits</div>
+            </div>
+        </div>
+        <div class="restaurant-hours">
+            <span class="abstract-text">$POGO • Robinhood Chain</span>
+        </div>
+    </header>
+
+    <nav class="mobile-app-nav" role="tablist" aria-label="Pogo apps">
+        <button class="tab-button active" data-tab="generator" role="tab" aria-selected="true" aria-controls="generator-panel">PFP</button>
+        <button class="tab-button" data-tab="game" role="tab" aria-selected="false" aria-controls="game-panel">Pogo Leap</button>
+        <a href="/pogo-poker/" class="tab-button pogo-poker-tab">Poker</a>
+    </nav>
+
+    <!-- Main Restaurant Container -->
+    <div class="restaurant-container" id="main-content">
+        
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-button" id="mobileMenuBtn" aria-label="Open mobile menu" popovertarget="mobileMenuOverlay">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+
+        <!-- Mobile Menu Overlay -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay" popover>
+            <div class="mobile-menu-content">
+                <div class="mobile-menu-header">
+                    <img src="POGO-pfp.png" alt="Pogo" class="mobile-menu-logo">
+                    <h2>Pogo's Apps</h2>
+                    <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close mobile menu" popovertarget="mobileMenuOverlay" popovertargetaction="hide">×</button>
+                </div>
+                <nav class="mobile-menu-nav" role="navigation">
+                    <button class="mobile-menu-item active" data-tab="generator" role="tab" aria-selected="true" aria-controls="generator-panel">
+                        <img src="walk.png" alt="Pogo Walking" class="mobile-menu-icon"> 
+                        <div class="mobile-menu-text">
+                            <span class="mobile-menu-title">PFP Generator</span>
+                            <span class="mobile-menu-desc">Create your Pogo avatar</span>
+                        </div>
+                    </button>
+                    <button class="mobile-menu-item" data-tab="game" role="tab" aria-selected="false" aria-controls="game-panel">
+                        <img src="game/token.png" alt="Pogo riding a pogo stick" class="mobile-menu-icon jump-animation">
+                        <div class="mobile-menu-text">
+                            <span class="mobile-menu-title">Pogo Leap</span>
+                            <span class="mobile-menu-desc">Leap and collect stars</span>
+                        </div>
+                    </button>
+                    <a href="/pogo-poker/" class="mobile-menu-item pogo-poker-tab" title="Pull up a lily pad at Pogo Poker">
+                        <img src="POGO-pfp.png" alt="Pogo Poker" class="mobile-menu-icon">
+                        <div class="mobile-menu-text">
+                            <span class="mobile-menu-title">Pogo Poker</span>
+                            <span class="mobile-menu-desc">Hold'em on Robinhood Chain</span>
+                        </div>
+                        <span class="mobile-beta-badge">BETA</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Tab Navigation (Desktop) -->
+        <nav class="tab-navigation desktop-nav" role="tablist">
+            <button class="tab-button active" data-tab="generator" role="tab" aria-selected="true" aria-controls="generator-panel">
+                <img src="walk.png" alt="Pogo Walking" class="tab-icon"> PFP Generator
+            </button>
+            <button class="tab-button" data-tab="game" role="tab" aria-selected="false" aria-controls="game-panel">
+                <img src="game/token.png" alt="Pogo riding a pogo stick" class="tab-icon jump-animation"> Pogo Leap
+            </button>
+            <a href="/pogo-poker/" class="tab-button pogo-poker-tab" title="Hold'em on Robinhood Chain — pull up a lily pad">
+                <img src="POGO-pfp.png" alt="Pogo Poker" class="tab-icon"> Pogo Poker
+            </a>
+        </nav>
+
+        <!-- PFP Generator Tab Panel -->
+        <section class="tab-panel active" id="generator-panel" role="tabpanel" aria-labelledby="generator-tab">
+            <div class="pogo-gen" role="main" aria-labelledby="generator-title">
+
+                <!-- Stage: preview + actions + receipt -->
+                <div class="pg-stage">
+                    <div class="pg-card pg-stage-card">
+                        <div class="pg-stage-head">
+                            <h2 id="generator-title" class="pg-title">BUILD-A-POGO</h2>
+                            <p class="pg-subtitle">Make the pond yours</p>
+                        </div>
+                        <div class="pg-canvas-wrap">
+                            <canvas id="pfpCanvas"
+                                    width="1000"
+                                    height="1000"
+                                    onclick="canvasClicked()"
+                                    aria-label="Your custom Pogo frog preview"
+                                    role="img">
+                                Your browser doesn't support canvas. Please update to see your frog!
+                            </canvas>
+                            <div class="pg-log-strip" aria-hidden="true"></div>
+                        </div>
+                    </div>
+
+                    <div class="pg-card pg-receipt">
+                        <div class="pg-receipt-head">
+                            <span class="pg-receipt-title">Selected</span>
+                            <span class="pg-receipt-note">Your look</span>
+                        </div>
+                        <div class="order-items"></div>
+                        <div class="pg-selected-actions">
+                            <button class="pg-btn pg-btn-leaf place-order-btn" onclick="downloadPFP()">
+                                Download PFP
+                            </button>
+                        </div>
+                        <span class="total-amount" hidden>$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Picker: traits, combos, pond info -->
+                <div class="pg-picker">
+                    <div class="pg-card pg-group">
+                        <div class="pg-group-head">
+                            <h3>Headgear</h3>
+                            <span class="pg-group-count">12 styles</span>
+                        </div>
+                        <div class="pg-grid" id="hatMenuItems">
+                            <!-- Menu items populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="pg-card pg-group">
+                        <div class="pg-group-head">
+                            <h3>Loot</h3>
+                            <span class="pg-group-count">8 picks</span>
+                        </div>
+                        <div class="pg-grid" id="itemMenuItems">
+                            <!-- Menu items populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="pg-card pg-utility-bar">
+                        <div class="pg-actions">
+                            <button class="pg-btn pg-btn-gold copy-btn" onclick="copyPFPToClipboard()">Copy</button>
+                            <button class="pg-btn pg-btn-ghost clear-order-btn" onclick="clearOrder()">Reset</button>
+                        </div>
+                        <div class="pg-combos" aria-label="Quick looks">
+                            <button class="pg-combo" onclick="quickOrder('crown', 'coin')">King</button>
+                            <button class="pg-combo" onclick="quickOrder('wizard', 'wand')">Wizard</button>
+                            <button class="pg-combo" onclick="quickOrder('rasta', 'joint')">Chill</button>
+                            <button class="pg-combo" onclick="quickOrder('robinhood', 'rh')">Robin Hood</button>
+                            <button class="pg-combo pg-combo-wild" onclick="randomizePFP()">Surprise Me</button>
+                        </div>
+                    </div>
+
+                    <div class="pg-card pg-pond-info">
+                        <button class="pg-contract" onclick="copyContract()" title="Copy contract address">
+                            <code class="contract-address">$POGO — CA coming soon</code>
+                            <span class="pg-copy-hint">Copy</span>
+                        </button>
+                        <div class="pg-socials">
+                            <a class="pg-social" href="https://discord.gg/JYFwCzmUK5" target="_blank" rel="noopener noreferrer" title="Join our Discord" aria-label="Discord">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                                </svg>
+                            </a>
+                            <a class="pg-social" onclick="openTwitter()" title="Follow us on X" aria-label="X (Twitter)">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                            </a>
+                            <a class="pg-social" onclick="openDexScreener()" title="View on DexScreener" aria-label="DexScreener Chart">
+                                <img src="dexscreenr.png" width="18" height="18" alt="DexScreener" onerror="this.style.display='none';">
+                            </a>
+                            <a class="pg-social" onclick="openTelegram()" title="Join our Telegram" aria-label="Telegram">
+                                <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Game Tab Panel -->
+        <section class="tab-panel" id="game-panel" role="tabpanel" aria-labelledby="game-tab">
+            <div class="game-container">
+                <!-- Game Header -->
+                <div class="game-header">
+                    <div class="game-title-section">
+                        <span class="game-kicker">Pond arcade</span>
+                        <h2 id="game-title">Pogo Leap</h2>
+                        <p class="game-subtitle">One more platform. One more run.</p>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-box">
+                            <span class="stat-value" id="currentScore">0</span>
+                            <span class="stat-label">Score</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value" id="bestScore">0</span>
+                            <span class="stat-label">Best</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-play-area">
+                    <!-- Game Canvas Container -->
+                    <div class="game-canvas-container">
+                        <canvas id="gameCanvas" width="320" height="480" aria-label="Pogo Leap Game"></canvas>
+                        <div class="game-overlay" id="gameOverlay">
+                            <div class="overlay-content" id="overlayContent">
+                                <!-- Dynamic content inserted by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside class="game-command-panel" aria-label="How to play Pogo Leap">
+                        <div class="game-command-copy">
+                            <span class="game-command-label">How to play</span>
+                            <h3>Keep climbing.</h3>
+                            <p>Land cleanly, dodge the swamp hazards, and collect stars on your way up.</p>
+                        </div>
+
+                        <dl class="game-control-guide">
+                            <div>
+                                <dt>Desktop</dt>
+                                <dd>Left / Right arrows</dd>
+                            </div>
+                            <div>
+                                <dt>Mobile</dt>
+                                <dd>Tap either side</dd>
+                            </div>
+                        </dl>
+
+                        <!-- Game Controls -->
+                        <div class="game-controls">
+                            <button id="playButton" class="game-btn primary">Start Game</button>
+                            <button id="leaderboardButton" class="game-btn secondary">View Leaderboard</button>
+                        </div>
+
+                        <!-- Mobile Instructions -->
+                        <div class="mobile-instructions">
+                            <p>Tap left or right to move. Climb higher to score more.</p>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+
+
+    </div>
+
+    <!-- Notification System -->
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+    <!-- Hidden Screen Reader Content -->
+    <div class="sr-only">
+        <p>
+            Welcome to Pogo's Leap Pad, an interactive pond where you can customize
+            your own crypto frog PFP. Use Tab to navigate the menu and Enter to select items.
+        </p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js?v=4"></script>
+    <!-- Game Modules -->
+    <script src="pogo-shims.js"></script>
+    <script src="game-assets.js?v=3"></script>
+    <script src="game-physics.js"></script>
+    <script src="game.js?v=4"></script>
+
+    <!-- Navigation: mobile menu (tab switching lives in script.js) -->
+    <script>
+        // Mobile Menu Functionality
+        function openMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+            if (!mobileMenuBtn || !mobileMenuOverlay) return;
+            mobileMenuOverlay.style.display = 'block';
+            mobileMenuOverlay.classList.add('active');
+            mobileMenuBtn.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function initializeMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const mobileMenuItems = document.querySelectorAll('.mobile-menu-item[data-tab]');
+
+            if (!mobileMenuBtn || !mobileMenuOverlay) return;
+
+            // Open mobile menu
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenuOverlay.style.display = 'block';
+                setTimeout(() => {
+                    mobileMenuOverlay.classList.add('active');
+                    mobileMenuBtn.classList.add('active');
+                }, 10);
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close mobile menu
+            const closeMobileMenu = () => {
+                mobileMenuOverlay.classList.remove('active');
+                mobileMenuBtn.classList.remove('active');
+                document.body.style.overflow = '';
+                setTimeout(() => {
+                    mobileMenuOverlay.style.display = 'none';
+                }, 300);
+            };
+
+            if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+
+            // Close on overlay click
+            mobileMenuOverlay.addEventListener('click', (e) => {
+                if (e.target === mobileMenuOverlay) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Close on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && mobileMenuOverlay.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Handle mobile menu item clicks for tabs
+            mobileMenuItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (!item.href) { // Only handle buttons, not anchor links
+                        e.preventDefault();
+                        const tabName = item.getAttribute('data-tab');
+
+                        // Update mobile menu active state
+                        mobileMenuItems.forEach(mi => mi.classList.remove('active'));
+                        item.classList.add('active');
+
+                        // Update desktop nav active state
+                        const desktopButtons = document.querySelectorAll('.desktop-nav .tab-button');
+                        desktopButtons.forEach(btn => {
+                            btn.classList.remove('active');
+                            btn.setAttribute('aria-selected', 'false');
+                        });
+
+                        const matchingDesktopBtn = document.querySelector(`.desktop-nav .tab-button[data-tab="${tabName}"]`);
+                        if (matchingDesktopBtn) {
+                            matchingDesktopBtn.classList.add('active');
+                            matchingDesktopBtn.setAttribute('aria-selected', 'true');
+                        }
+
+                        // Switch tab panels (script.js's switchTab also handles game init)
+                        if (typeof switchTab === 'function') {
+                            switchTab(tabName);
+                        }
+
+                        // Close mobile menu
+                        closeMobileMenu();
+                    }
+                });
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeMobileMenu, { once: true });
+        } else {
+            initializeMobileMenu();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+import { cn, initials } from "@/lib/utils";
+import { formatAmount } from "@/lib/ledger/money";
+import type { Asset } from "@/lib/ledger/money";
+import type { WireSeat } from "@/lib/realtime/events";
+import { PlayingCard } from "./playing-card";
+import { Card3D } from "./card-3d";
+import { VideoTile } from "./video-tile";
+import type { Card } from "@/lib/poker/types";
+
+/** Short verb (+ amount where it reads clearly) for a seat's last move. */
+function actionLabel(
+  la: NonNullable<WireSeat["lastAction"]>,
+  asset: Asset,
+): string {
+  switch (la.action) {
+    case "CHECK":
+      return "Check";
+    case "CALL":
+      return `Call ${formatAmount(asset, BigInt(la.amount))}`;
+    case "BET":
+      return `Bet ${formatAmount(asset, BigInt(la.amount))}`;
+    case "RAISE":
+      return `Raise ${formatAmount(asset, BigInt(la.amount))}`;
+    case "ALL_IN":
+      return "All-in";
+    case "FOLD":
+      return "Fold";
+    default:
+      return "";
+  }
+}
+
+/**
+ * A player position on the rim of the oval table — a tactile pod with a circular
+ * avatar, a depleting timer ring for the seat to act, the dealer button, a
+ * name/stack pill, and the player's cards tucked above. Live bets are rendered
+ * separately as chips on the felt by the table view.
+ */
+export function Seat({
+  seat,
+  asset,
+  isDealer,
+  isToAct,
+  isYou,
+  holeCards,
+  clock,
+  revealCards,
+  handLabel,
+  show3d,
+  isWinner,
+  compact,
+  videoTrack,
+}: {
+  seat: WireSeat;
+  asset: Asset;
+  isDealer: boolean;
+  isToAct: boolean;
+  isYou: boolean;
+  holeCards?: Card[] | null;
+  /** Live action clock for the seat to act; null for every other seat. */
+  clock?: { secondsLeft: number; fraction: number } | null;
+  /** Opponent hole cards to flip face-up at showdown (null otherwise). */
+  revealCards?: Card[] | null;
+  /** Hand-rank label shown under the pod at showdown (e.g. "Two Pair"). */
+  handLabel?: string | null;
+  /** At a contested showdown, flip YOUR hand to the premium 3D card. */
+  show3d?: boolean;
+  /** This seat won the pot — pulse the avatar gold. */
+  isWinner?: boolean;
+  /** Tighter sizing for small/portrait screens. */
+  compact?: boolean;
+  /** Live camera track for this seat — turns the round avatar into a square video. */
+  videoTrack?: MediaStreamTrack | null;
+}) {
+  if (!seat.playerId) {
+    return (
+      <div className="grid h-11 w-11 place-items-center rounded-full border border-dashed border-white/12 text-[10px] text-ash/40">
+        {seat.seat + 1}
+      </div>
+    );
+  }
+
+  const urgent = clock != null && clock.secondsLeft <= 5;
+  const showdownCards = revealCards && revealCards.length ? revealCards : null;
+  const revealed = showdownCards ?? (isYou ? holeCards : (seat.holeCards ?? null));
+  // Show the card row whenever the player is in the hand OR we're revealing at
+  // showdown (their seat may already be flagged out-of-hand by settlement).
+  const showCards = seat.inHand || showdownCards != null;
+  const C = 2 * Math.PI * 25; // timer-ring circumference (r = 25)
+
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col items-center transition-opacity duration-300",
+        seat.hasFolded && "opacity-40",
+      )}
+    >
+      {/* Cards — tucked toward the board. On mobile they sit BEHIND the avatar
+          with a deep overlap so the cluster is short (no clipping at the felt
+          edge); only the readable top of each card peeks out. */}
+      {showCards && (
+        <div
+          className={cn(
+            "flex",
+            isYou ? "gap-1.5" : "gap-px",
+            compact ? "z-0 mb-[-22px]" : "relative z-10 mb-[-8px]",
+          )}
+          style={{ filter: "drop-shadow(0 8px 14px rgba(0,0,0,0.45))" }}
+        >
+          {revealed ? (
+            revealed.map((c) =>
+              isYou && show3d ? (
+                <Card3D key={c} card={c} size={compact ? "sm" : "md"} glow float />
+              ) : (
+                <PlayingCard
+                  key={c}
+                  card={c}
+                  size={isYou && !compact ? "md" : "sm"}
+                />
+              ),
+            )
+          ) : (
+            <>
+              <PlayingCard size="sm" faceDown />
+              <PlayingCard size="sm" faceDown />
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Avatar with timer ring + dealer button */}
+      <div className={cn("relative", compact && "z-10")}>
+        {isToAct && clock && (
+          <svg
+            viewBox="0 0 56 56"
+            className="absolute left-1/2 top-1/2 h-[60px] w-[60px] -translate-x-1/2 -translate-y-1/2 -rotate-90"
+            style={{ overflow: "visible" }}
+          >
+            <circle
+              cx="28"
+              cy="28"
+              r="25"
+              fill="none"
+              stroke="rgba(0,0,0,0.4)"
+              strokeWidth="3"
+            />
+            <circle
+              cx="28"
+              cy="28"
+              r="25"
+              fill="none"
+              strokeWidth="3"
+              strokeLinecap="round"
+              stroke={urgent ? "#f87171" : "#86efac"}
+              strokeDasharray={C}
+              strokeDashoffset={C * (1 - clock.fraction)}
+              style={{ transition: "stroke-dashoffset 0.25s linear" }}
+            />
+          </svg>
+        )}
+        <div
+          className={cn(
+            "grid h-12 w-12 place-items-center overflow-hidden border-2 text-[13px] font-semibold tracking-wide transition-shadow",
+            // Video turns the round avatar into an easier-to-read square tile.
+            videoTrack ? "rounded-lg" : "rounded-full",
+            isWinner && "animate-win-glow",
+            isYou
+              ? "border-pogo bg-pogo/20 text-ivory"
+              : "border-white/15 bg-charcoal-700 text-ivory",
+          )}
+          style={
+            isToAct
+              ? {
+                  boxShadow: urgent
+                    ? "0 0 0 2px #f87171, 0 0 13px rgba(248,113,113,0.45)"
+                    : "0 0 0 2px #4ade80, 0 0 13px rgba(34,197,94,0.5)",
+                }
+              : undefined
+          }
+        >
+          {videoTrack ? (
+            <VideoTile
+              track={videoTrack}
+              mirror={isYou}
+              className="h-full w-full"
+            />
+          ) : isYou ? (
+            "YOU"
+          ) : (
+            initials(seat.displayName)
+          )}
+        </div>
+        {isDealer && (
+          // Dealer button sits to the right of the avatar (vertically centered)
+          // so it never covers the name/stack pill below it.
+          <span className="absolute top-1/2 -right-2.5 -translate-y-1/2 grid h-5 w-5 place-items-center rounded-full bg-ivory text-[10px] font-bold text-charcoal-900 ring-2 ring-charcoal-900">
+            D
+          </span>
+        )}
+      </div>
+
+      {/* Name + stack pill — sits clearly BELOW the avatar (and its to-act ring/
+          glow) so the player's name and stack are never covered. */}
+      <div
+        className={cn(
+          "mt-1.5 min-w-[3.75rem] max-w-[7rem] rounded-full px-2.5 py-0.5 text-center shadow-sm",
+          isToAct ? "bg-pogo/40" : "bg-charcoal-900/85",
+        )}
+        style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+      >
+        <p className="truncate text-[11px] leading-tight text-ivory-muted">
+          {isYou ? "You" : (seat.displayName ?? "Player")}
+        </p>
+        <p
+          className="font-mono text-[11px] leading-tight"
+          style={{ color: seat.isAllIn ? "#bbf7d0" : "#bbf7d0" }}
+        >
+          {seat.isAllIn ? "ALL-IN" : formatAmount(asset, BigInt(seat.stack))}
+        </p>
+      </div>
+
+      {handLabel ? (
+        <span className="mt-1 max-w-[7rem] truncate rounded-md border border-amber-300/40 bg-amber-300/15 px-2 py-px text-[9px] font-semibold uppercase tracking-[0.1em] text-amber-100 shadow-sm">
+          {handLabel}
+        </span>
+      ) : seat.hasFolded ? (
+        <span className="mt-1 rounded-md border border-white/8 bg-charcoal-900/85 px-1.5 py-px text-[9px] uppercase tracking-[0.13em] text-ash/80">
+          Fold
+        </span>
+      ) : seat.lastAction ? (
+        <span className="mt-1 rounded-md border border-pogo/45 bg-pogo/25 px-2 py-px text-[9px] font-semibold uppercase tracking-[0.1em] text-ivory shadow-sm">
+          {actionLabel(seat.lastAction, asset)}
+        </span>
+      ) : (
+        !seat.inHand && (
+          <span className="mt-0.5 text-[9px] uppercase tracking-wide text-ash/50">
+            {seat.sittingOut ? "Sitting out" : "Waiting"}
+          </span>
+        )
+      )}
+    </div>
+  );
+}
