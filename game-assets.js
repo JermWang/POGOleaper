@@ -27,7 +27,7 @@ class GameAssets {
             leftJump: 'game/left_jump.png',
             rightJump: 'game/right_jump.png', 
             walk: 'game/walk.png',
-            
+
             // Enemies/obstacles
             evilToad: 'game/evil-toad.png'
         };
@@ -142,40 +142,40 @@ class GameAssets {
         return {
             // Biome-based sky colors (height-dependent)
             biomes: {
-                ground: { // 0-2K pixels - Ground level (Restaurant theme)
-                    skyTop: '#FFF8DC',    // Warm cream/coin silk
-                    skyMiddle: '#FFEB9C', // Soft golden yellow
-                    skyBottom: '#F4A460', // Sandy brown - restaurant warmth
-                    particleColor: '#fbbf24', // Golden feathers
-                    name: 'Restaurant Grounds'
+                ground: { // 0-2K pixels - The pond (matches the site background)
+                    skyTop: '#dcfd52',    // Lime pond sky
+                    skyMiddle: '#eaffa3', // Soft lime haze
+                    skyBottom: '#45c8f2', // Pond water blue
+                    particleColor: '#dcfd52', // Lime pollen
+                    name: 'Lily Pad Pond'
                 },
-                city: { // 2K-8K pixels - City skyline
-                    skyTop: '#4a5568',    // Slate gray
-                    skyMiddle: '#718096', // Cool gray
-                    skyBottom: '#a0aec0', // Light gray
-                    particleColor: '#fed7d7',
-                    name: 'Elite City Heights'
+                city: { // 2K-8K pixels - Reeds & cattails above the water
+                    skyTop: '#8fd24a',    // Meadow green
+                    skyMiddle: '#bfe86a', // Warm lime
+                    skyBottom: '#79c98f', // Marsh green
+                    particleColor: '#eaffa3',
+                    name: 'Cattail Marsh'
                 },
-                clouds: { // 8K-20K pixels - Cloud level
-                    skyTop: '#e2e8f0',    // Very light gray
-                    skyMiddle: '#f7fafc', // Almost white
-                    skyBottom: '#cbd5e0', // Light blue-gray
+                clouds: { // 8K-20K pixels - Misty canopy
+                    skyTop: '#cfe8d6',    // Soft mint mist
+                    skyMiddle: '#eef9ee', // Pale haze
+                    skyBottom: '#bfe0c8', // Green-white
                     particleColor: '#ffffff',
-                    name: 'Legendary Cloud Nine'
+                    name: 'Misty Canopy'
                 },
-                space: { // 5M-10M points - Near space
-                    skyTop: '#1a202c',
-                    skyMiddle: '#2d3748',
-                    skyBottom: '#4a5568',
-                    particleColor: '#ffd700',
-                    name: 'Mythic Stratosphere'
+                space: { // 20K+ pixels - Twilight leap
+                    skyTop: '#241f43',    // Deep dusk
+                    skyMiddle: '#4b3b7a', // Twilight purple
+                    skyBottom: '#a06fc0', // Sunset lilac
+                    particleColor: '#fbbf24',
+                    name: 'Twilight Leap'
                 },
-                cosmos: { // 10M+ points - Deep space
-                    skyTop: '#000000',
-                    skyMiddle: '#1a1a2e',
-                    skyBottom: '#16213e',
+                cosmos: { // 40K+ pixels - To the moon
+                    skyTop: '#04040d',    // Night sky
+                    skyMiddle: '#0a1230', // Deep space
+                    skyBottom: '#14203c', // Midnight pond reflection
                     particleColor: '#ffffff',
-                    name: 'Transcendent Cosmos'
+                    name: 'Cosmic Pond'
                 }
             },
             
@@ -183,15 +183,15 @@ class GameAssets {
             
             // Platform colors - STRATEGIC BOUNCE SYSTEM
             platform: {
-                normal: '#8B4513',
+                normal: '#3aab30',        // Lily pad green
                 spring: '#22c55e',        // Green - Standard spring (1.7x bounce)
-                superspring: '#ffd700',   // Bright Gold - MEGA spring (2.1x bounce)  
+                superspring: '#ffd700',   // Bright Gold - MEGA spring (2.1x bounce)
                 minispring: '#87ceeb',    // Light Blue - Mini spring (1.35x bounce)
-                moving: '#22c55e',
-                breaking: '#22c55e',
+                moving: '#3aab30',        // Lily pad green
+                breaking: '#5c8a3a',      // Wilting reed green
                 cloud: '#ffffff',
                 ice: '#add8e6',           // Light blue - Slippery ice platform
-                disappearing: '#8b4513',  // Brown - Fading platform
+                disappearing: '#6b8f3a',  // Fading lily pad
                 evil: '#7c2d12'
             },
             
@@ -463,6 +463,22 @@ class GameAssets {
         
         // Add platform details based on type - STRATEGIC SPRING SYSTEM
         switch(type) {
+            case 'normal':
+                // Lily-pad styling: top sheen, radiating veins, darker underside
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+                ctx.fillRect(x, y, width, Math.max(2, height * 0.34));
+                ctx.strokeStyle = 'rgba(10, 58, 20, 0.45)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let v = 0; v < 3; v++) {
+                    ctx.moveTo(x + width / 2, y + height);
+                    ctx.lineTo(x + width * (0.25 + v * 0.25), y);
+                }
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(10, 58, 20, 0.4)';
+                ctx.fillRect(x, y + height - 2, width, 2);
+                break;
+
             case 'superspring':
                 // MEGA SPRING - Bright gold with large visual indicator
                 ctx.fillStyle = '#FFD700'; // Bright gold
@@ -934,24 +950,93 @@ class GameAssets {
         ctx.restore();
     }
 
-    // Draw restaurant buildings for ground biome
+    // Draw the pond scene for the ground biome (water, lily pads, cattails)
     drawRestaurantBuildings(ctx, canvasWidth, canvasHeight, scrollY) {
         ctx.save();
-        
-        // Draw buildings in the background that scroll slower (parallax effect)
-        const buildingOffset = (scrollY * 0.05) % 800;
-        const buildingSpacing = 120;
-        const buildingCount = Math.ceil(canvasWidth / buildingSpacing) + 2;
-        
-        for (let i = 0; i < buildingCount; i++) {
-            const x = (i * buildingSpacing) - buildingOffset;
-            const buildingType = i % 3; // Different building types
-            
-            if (x > -100 && x < canvasWidth + 100) {
-                this.drawRestaurantBuilding(ctx, x, canvasHeight, buildingType);
-            }
+        const waterY = canvasHeight - 34;
+
+        // Pond water band along the bottom
+        ctx.fillStyle = 'rgba(69, 200, 242, 0.55)';
+        ctx.fillRect(0, waterY, canvasWidth, canvasHeight - waterY + 12);
+
+        // Water shimmer lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 2;
+        const shimmer = (scrollY * 0.05) % 60;
+        for (let i = -1; i < canvasWidth / 60 + 1; i++) {
+            const sx = i * 60 - shimmer;
+            ctx.beginPath();
+            ctx.moveTo(sx, waterY + 13);
+            ctx.quadraticCurveTo(sx + 15, waterY + 9, sx + 30, waterY + 13);
+            ctx.stroke();
         }
-        
+
+        // Floating lily pads (parallax)
+        const padOffset = (scrollY * 0.06) % 220;
+        for (let i = -1; i < canvasWidth / 110 + 1; i++) {
+            const px = i * 110 - padOffset + 30;
+            this.drawLilyPad(ctx, px, waterY + 15 + (i % 2) * 7, 24 + (i % 3) * 6);
+        }
+
+        // Cattails / reeds rising from the water (slower parallax)
+        const reedOffset = (scrollY * 0.04) % 130;
+        for (let i = -1; i < canvasWidth / 65 + 2; i++) {
+            const rx = i * 65 - reedOffset + 12;
+            this.drawReed(ctx, rx, waterY + 4, 44 + (i % 3) * 24, i % 2 === 0);
+        }
+
+        ctx.restore();
+    }
+
+    // A single lily pad
+    drawLilyPad(ctx, cx, cy, r) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(46, 140, 42, 0.9)';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, r, r * 0.44, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(10, 58, 20, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        // notch wedge (background lime) + a couple veins
+        ctx.fillStyle = 'rgba(220, 253, 82, 0.5)';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + r * 0.9, cy - r * 0.22);
+        ctx.lineTo(cx + r * 0.9, cy + r * 0.22);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(10, 58, 20, 0.28)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy); ctx.lineTo(cx - r * 0.7, cy - r * 0.28);
+        ctx.moveTo(cx, cy); ctx.lineTo(cx - r * 0.7, cy + r * 0.28);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    // A single reed/cattail stalk
+    drawReed(ctx, x, baseY, h, cattail) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(28, 108, 40, 0.6)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x, baseY);
+        ctx.quadraticCurveTo(x + 6, baseY - h * 0.6, x + 2, baseY - h);
+        ctx.stroke();
+        if (cattail) {
+            ctx.fillStyle = 'rgba(120, 72, 30, 0.75)';
+            ctx.beginPath();
+            ctx.ellipse(x + 2, baseY - h, 4, 11, 0, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            ctx.strokeStyle = 'rgba(40, 130, 50, 0.55)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x + 2, baseY - h * 0.5);
+            ctx.quadraticCurveTo(x + 16, baseY - h * 0.72, x + 20, baseY - h * 0.96);
+            ctx.stroke();
+        }
         ctx.restore();
     }
 
@@ -1009,24 +1094,29 @@ class GameAssets {
         }
     }
 
-    // Draw city skyline for city biome
+    // Draw a marsh of tall reeds & cattails for the "Cattail Marsh" biome
     drawCitySkyline(ctx, canvasWidth, canvasHeight, scrollY) {
         ctx.save();
-        
-        // Draw distant buildings with parallax
-        const skylineOffset = (scrollY * 0.03) % 1000;
-        const buildingSpacing = 80;
-        const buildingCount = Math.ceil(canvasWidth / buildingSpacing) + 2;
-        
-        for (let i = 0; i < buildingCount; i++) {
-            const x = (i * buildingSpacing) - skylineOffset;
-            const buildingHeight = 200 + (Math.sin(i * 0.5) * 100);
-            
-            if (x > -150 && x < canvasWidth + 150) {
-                this.drawCityBuilding(ctx, x, canvasHeight, buildingHeight, i);
-            }
+        const baseY = canvasHeight - 16;
+
+        // Back layer — pale, taller reeds (slow parallax)
+        ctx.globalAlpha = 0.5;
+        const backOffset = (scrollY * 0.025) % 70;
+        for (let i = -1; i < canvasWidth / 35 + 2; i++) {
+            const rx = i * 35 - backOffset;
+            const h = 150 + Math.sin(i * 0.6) * 60;
+            this.drawReed(ctx, rx, baseY, h, i % 4 === 0);
         }
-        
+
+        // Front layer — denser, closer reeds
+        ctx.globalAlpha = 0.85;
+        const frontOffset = (scrollY * 0.045) % 55;
+        for (let i = -1; i < canvasWidth / 55 + 2; i++) {
+            const rx = i * 55 - frontOffset + 20;
+            const h = 100 + Math.sin(i * 0.9 + 1.5) * 45;
+            this.drawReed(ctx, rx, baseY, h, i % 3 === 0);
+        }
+
         ctx.restore();
     }
 
@@ -1366,21 +1456,64 @@ class GameAssets {
         ctx.restore();
     }
 
-    // Draw collectible token as a gold star so the player remains the only Pogo sprite.
+    // Draw the collectible as a shiny gold $POGO coin (procedural — clearly a
+    // coin, on-theme, and never confused with the Pogo-frog player sprite).
     drawToken(ctx, token) {
         if (token.collected) return;
 
         ctx.save();
         const time = Date.now() * 0.003;
         const bobOffset = Math.sin(time + token.bobOffset) * 3;
-        const pulseScale = 1 + Math.sin(time * 2 + token.pulseTime) * 0.15;
+        const pulseScale = 1 + Math.sin(time * 2 + token.pulseTime) * 0.1;
+        // Gentle coin "spin" by squashing horizontally
+        const spin = 0.55 + Math.abs(Math.cos(time * 1.6 + token.bobOffset)) * 0.45;
         const centerX = token.x + token.width / 2;
         const centerY = token.y + token.height / 2 + bobOffset;
+        const r = 16;
 
         ctx.translate(centerX, centerY);
-        ctx.rotate(Math.sin(time * 0.8 + token.bobOffset) * 0.08);
-        ctx.scale(pulseScale, pulseScale);
-        this.drawCollectibleStar(ctx, 24, '#fbbf24', '#b45309');
+        ctx.scale(pulseScale * spin, pulseScale);
+
+        // Glow + rim
+        ctx.shadowColor = 'rgba(251, 191, 36, 0.7)';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = '#c9820c';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Coin face
+        const grad = ctx.createRadialGradient(-r * 0.32, -r * 0.32, r * 0.1, 0, 0, r);
+        grad.addColorStop(0, '#ffe680');
+        grad.addColorStop(0.6, '#fbbf24');
+        grad.addColorStop(1, '#e0930f');
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.82, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(146, 64, 14, 0.55)';
+        ctx.stroke();
+
+        // "P" mark (only when the coin is turned toward us)
+        if (spin > 0.72) {
+            ctx.save();
+            ctx.scale(1 / spin, 1); // un-squash the letter so it stays legible
+            ctx.fillStyle = 'rgba(120, 72, 12, 0.85)';
+            ctx.font = `bold ${Math.round(r * 1.15)}px "Bungee", system-ui, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('P', 0, 1);
+            ctx.restore();
+        }
+
+        // Shine highlight
+        ctx.beginPath();
+        ctx.arc(-r * 0.34, -r * 0.36, r * 0.16, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.fill();
+
         ctx.restore();
     }
 

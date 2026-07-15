@@ -2943,10 +2943,10 @@ class PogoLeapGame {
         const achievementDefs = [
             // Height achievements - Updated for accessible biome transitions
             { id: 'first_jump', name: 'Baby Steps', description: 'Jump on your first platform', requirement: 1, type: 'platformsJumped' },
-            { id: 'city_heights', name: 'City Explorer', description: 'Reach the City Heights biome (2000px)', requirement: 2000, type: 'height' },
-            { id: 'cloud_nine', name: 'Head in the Clouds', description: 'Reach the Cloud Nine biome (8000px)', requirement: 8000, type: 'height' },
-            { id: 'stratosphere', name: 'Space Cadet', description: 'Reach the Stratosphere biome (20000px)', requirement: 20000, type: 'height' },
-            { id: 'deep_space', name: 'Cosmic Frog', description: 'Reach Deep Space biome (40000px)', requirement: 40000, type: 'height' },
+            { id: 'city_heights', name: 'Marsh Explorer', description: 'Reach the Cattail Marsh biome (2000px)', requirement: 2000, type: 'height' },
+            { id: 'cloud_nine', name: 'Head in the Canopy', description: 'Reach the Misty Canopy biome (8000px)', requirement: 8000, type: 'height' },
+            { id: 'stratosphere', name: 'Twilight Leaper', description: 'Reach the Twilight Leap biome (20000px)', requirement: 20000, type: 'height' },
+            { id: 'deep_space', name: 'Cosmic Frog', description: 'Reach the Cosmic Pond biome (40000px)', requirement: 40000, type: 'height' },
             
             // Combat achievements
             { id: 'first_toad', name: 'Toad Slayer', description: 'Defeat your first Evil Toad', requirement: 1, type: 'evilToadsDefeated' },
@@ -2967,7 +2967,7 @@ class PogoLeapGame {
             // Special achievements
             { id: 'biome_explorer', name: 'Biome Explorer', description: 'Visit all 5 biomes in one game', requirement: 5, type: 'biomesReached' },
             { id: 'million_point_club', name: 'Million Point Club', description: 'Join the elite million point club', requirement: 1000000, type: 'score' },
-            { id: 'ultimate_pogo', name: 'Ultimate Pogo', description: 'Reach the Transcendent Cosmos', requirement: 1000000, type: 'height' }
+            { id: 'ultimate_pogo', name: 'Ultimate Pogo', description: 'Reach the Cosmic Pond', requirement: 1000000, type: 'height' }
         ];
         
         // Initialize all achievements as locked
