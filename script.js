@@ -86,10 +86,16 @@ const layers = {
     item: null
 };
 
+// Revision the base URL whenever the source artwork is renewed so production
+// browsers and CDNs cannot keep serving an older cached Pogo image.
+const PFP_BASE_IMAGE_SRC = 'assets/base/POGO.png?v=renewed-20260715';
+
 // Canvas renders are asynchronous because each selected asset is an image.
 // Keep one revision counter and one shared cache so an older, slower request can
 // never draw over a newer selection.
 const pfpImageCache = new Map();
+const pfpTraitOverlayCache = new Map();
+const pfpBasePixelCache = new Map();
 let pfpRenderRevision = 0;
 let latestPFPRender = Promise.resolve();
 
@@ -425,7 +431,7 @@ function createMenuItem(category, item) {
     const visual = item.id
         ? `<img src="assets/thumbs/${thumbDir}/${item.id}.png" alt="" loading="lazy"
                onerror="this.parentElement.textContent='${item.emoji}';">`
-        : `<img src="assets/base/POGO.png" alt="" loading="lazy">`;
+        : `<img src="${PFP_BASE_IMAGE_SRC}" alt="" loading="lazy">`;
 
     menuItem.innerHTML = `
         <div class="item-image">${visual}</div>
@@ -575,14 +581,14 @@ function updateOrderSummary() {
                 name: currentOrder.hatName || getMenuItemName(currentOrder.hat, 'hats') || 'Bare Head',
                 image: currentOrder.hat
                     ? `assets/thumbs/hat/${currentOrder.hat}.png`
-                    : 'assets/base/POGO.png'
+                    : PFP_BASE_IMAGE_SRC
             },
             {
                 label: 'Loot',
                 name: currentOrder.itemName || getMenuItemName(currentOrder.item, 'items') || 'No Loot',
                 image: currentOrder.item
                     ? `assets/thumbs/item/${currentOrder.item}.png`
-                    : 'assets/base/POGO.png'
+                    : PFP_BASE_IMAGE_SRC
             }
         ];
 
@@ -753,6 +759,78 @@ function loadPFPImage(src) {
     return request;
 }
 
+function getPFPBasePixels(baseImage, width, height) {
+    const cacheKey = `${width}x${height}`;
+    if (pfpBasePixelCache.has(cacheKey)) return pfpBasePixelCache.get(cacheKey);
+
+    const baseCanvas = document.createElement('canvas');
+    baseCanvas.width = width;
+    baseCanvas.height = height;
+    const baseContext = baseCanvas.getContext('2d', { willReadFrequently: true });
+    baseContext.drawImage(baseImage, 0, 0, width, height);
+    const pixels = baseContext.getImageData(0, 0, width, height).data;
+    pfpBasePixelCache.set(cacheKey, pixels);
+    return pixels;
+}
+
+// The supplied trait PNGs are full Pogo composites, not transparent accessory
+// layers. Convert each one into a true overlay by removing every pixel that is
+// unchanged from the bare base. Category bounds provide an additional hard
+// guarantee that loot never repaints the head and headgear never repaints the
+// lower-body loot area.
+function createPFPTraitOverlay(baseImage, traitImage, category) {
+    const cacheKey = `${category}:${traitImage.src}`;
+    if (pfpTraitOverlayCache.has(cacheKey)) return pfpTraitOverlayCache.get(cacheKey);
+
+    const width = traitImage.naturalWidth || traitImage.width;
+    const height = traitImage.naturalHeight || traitImage.height;
+    const overlayCanvas = document.createElement('canvas');
+    overlayCanvas.width = width;
+    overlayCanvas.height = height;
+
+    const overlayContext = overlayCanvas.getContext('2d', { willReadFrequently: true });
+    overlayContext.drawImage(traitImage, 0, 0, width, height);
+
+    const overlayImageData = overlayContext.getImageData(0, 0, width, height);
+    const overlayPixels = overlayImageData.data;
+    const basePixels = getPFPBasePixels(baseImage, width, height);
+    const lootStartY = Math.floor(height * 0.48);
+    const headgearEndY = Math.floor(height * 0.62);
+
+    for (let offset = 0; offset < overlayPixels.length; offset += 4) {
+        const y = Math.floor((offset / 4) / width);
+
+        if (
+            (category === 'item' && y < lootStartY) ||
+            (category === 'hat' && y > headgearEndY)
+        ) {
+            overlayPixels[offset + 3] = 0;
+            continue;
+        }
+
+        const traitAlpha = overlayPixels[offset + 3];
+        if (traitAlpha === 0) continue;
+
+        const maxColorDelta = Math.max(
+            Math.abs(overlayPixels[offset] - basePixels[offset]),
+            Math.abs(overlayPixels[offset + 1] - basePixels[offset + 1]),
+            Math.abs(overlayPixels[offset + 2] - basePixels[offset + 2])
+        );
+        const alphaDelta = Math.abs(traitAlpha - basePixels[offset + 3]);
+
+        // PNG layers are lossless, but a tiny tolerance also removes edge pixels
+        // whose only difference is harmless export noise.
+        if (maxColorDelta <= 4 && alphaDelta <= 2) {
+            overlayPixels[offset + 3] = 0;
+        }
+    }
+
+    overlayContext.clearRect(0, 0, width, height);
+    overlayContext.putImageData(overlayImageData, 0, 0);
+    pfpTraitOverlayCache.set(cacheKey, overlayCanvas);
+    return overlayCanvas;
+}
+
 async function renderCurrentPFP() {
     if (!canvas || !ctx) return false;
 
@@ -766,7 +844,7 @@ async function renderCurrentPFP() {
 
     try {
         const [baseImage, hatImage, itemImage] = await Promise.all([
-            loadPFPImage('assets/base/POGO.png'),
+            loadPFPImage(PFP_BASE_IMAGE_SRC),
             selection.hat ? loadPFPImage(`assets/hat/${selection.hat}.png`) : Promise.resolve(null),
             selection.item ? loadPFPImage(`assets/item/${selection.item}.png`) : Promise.resolve(null)
         ]);
@@ -782,8 +860,8 @@ async function renderCurrentPFP() {
         }
 
         layers.base = baseImage;
-        layers.hat = hatImage;
-        layers.item = itemImage;
+        layers.hat = hatImage ? createPFPTraitOverlay(baseImage, hatImage, 'hat') : null;
+        layers.item = itemImage ? createPFPTraitOverlay(baseImage, itemImage, 'item') : null;
         drawPFP();
 
         canvas.dataset.renderedHat = selection.hat;
@@ -818,26 +896,26 @@ function drawPFP() {
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // The original layer files include generous transparent margins. Draw the
-    // complete stack slightly larger so Pogo reads as the hero while every
-    // accessory remains perfectly aligned in the exported image.
-    const layerWidth = 1000;
-    const layerHeight = 1000;
-    const layerX = (canvas.width - layerWidth) / 2;
-    const layerY = (canvas.height - layerHeight) / 2;
+    // Keep the complete native 1:1 artwork inside the square export. Matching
+    // the layer bounds to the canvas prevents tall hats and wide loot from being
+    // cropped while preserving the exact alignment of every trait.
+    const layerWidth = canvas.width;
+    const layerHeight = canvas.height;
+    const layerX = 0;
+    const layerY = 0;
     
     // Draw base frog
-    if (layers.base && layers.base.complete) {
+    if (layers.base) {
         ctx.drawImage(layers.base, layerX, layerY, layerWidth, layerHeight);
     }
     
     // Draw hat topping
-    if (layers.hat && layers.hat.complete) {
+    if (layers.hat) {
         ctx.drawImage(layers.hat, layerX, layerY, layerWidth, layerHeight);
     }
     
     // Draw item side
-    if (layers.item && layers.item.complete) {
+    if (layers.item) {
         ctx.drawImage(layers.item, layerX, layerY, layerWidth, layerHeight);
     }
     
@@ -1514,10 +1592,9 @@ function initializeCanvas() {
             return false;
         }
         
-        // Set canvas properties to match asset resolution
-        // Native resolution of the Pogo layer art — draw 1:1, no resampling
-        canvas.width = 760;
-        canvas.height = 760;
+        // Native square export resolution used by every Pogo source layer.
+        canvas.width = 1000;
+        canvas.height = 1000;
         
         // Clear canvas with transparent background
         ctx.clearRect(0, 0, canvas.width, canvas.height);

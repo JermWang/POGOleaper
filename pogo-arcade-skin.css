@@ -1,0 +1,82 @@
+/* =====================================================================
+   POGO ARCADE SKIN — brings the promo-video look to the live site.
+   Additive layer (load LAST). Signature moves lifted from the video:
+     • gold poster headlines with ink outlines + hard drop shadow
+     • floating gold-coin & sparkle accents
+     • chunkier cartoon depth on the hero cards
+   Motion is gated behind prefers-reduced-motion.
+   ===================================================================== */
+
+@keyframes pg-coin-float { 0%,100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-10px) rotate(6deg); } }
+@keyframes pg-spark-tw   { 0%,100% { transform: scale(0.82) rotate(0);  opacity: 0.55; } 50% { transform: scale(1.12) rotate(20deg); opacity: 1; } }
+
+/* ---- Gold poster headlines (the video's $POGO / POGO look) ---- */
+.pogo-gen .pg-title,
+#game-title,
+.palace-title {
+    font-family: 'Bungee', 'Fredoka', sans-serif !important;
+    color: var(--premium-gold) !important;
+    -webkit-text-stroke: 3px var(--premium-ink);
+    paint-order: stroke fill;
+    text-shadow: none !important;
+    filter: drop-shadow(4px 5px 0 rgba(22, 33, 15, 0.32));
+}
+#game-title { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1; }
+.palace-title { -webkit-text-stroke-width: 2px; filter: drop-shadow(2px 3px 0 rgba(22, 33, 15, 0.4)); }
+
+/* SELECTED panel title — a smaller poster so it still reads as a header */
+.pogo-gen .pg-receipt-title {
+    font-family: 'Bungee', 'Fredoka', sans-serif !important;
+    color: var(--premium-gold) !important;
+    -webkit-text-stroke: 2px var(--premium-ink);
+    paint-order: stroke fill;
+    filter: drop-shadow(3px 4px 0 rgba(22, 33, 15, 0.3));
+}
+
+/* ---- Chunkier cartoon depth on the hero cards ---- */
+.pogo-gen .pg-stage-card,
+.pogo-gen .pg-receipt {
+    border-width: 4px;
+    box-shadow: 0 9px 0 rgba(22, 33, 15, 0.85);
+}
+.pogo-gen .pg-canvas-wrap { border-width: 4px; }
+
+/* ---- Floating coin + sparkle accents ---- */
+.pogo-gen .pg-stage-head { position: relative; overflow: visible; }
+.pogo-gen .pg-stage-head::after {
+    content: '$';
+    position: absolute; top: -26px; left: 0;
+    width: 46px; height: 46px; border-radius: 50%;
+    background: radial-gradient(circle at 36% 30%, #ffe483, #f6b81f 58%, #d98b12);
+    border: 3px solid var(--premium-ink);
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.16), 0 4px 0 rgba(22,33,15,0.4);
+    color: var(--premium-ink); font-family: 'Bungee', sans-serif; font-size: 22px;
+    display: grid; place-items: center; pointer-events: none;
+    animation: pg-coin-float 3.2s ease-in-out infinite;
+}
+/* nudge the title clear of the coin so they don't collide */
+.pogo-gen .pg-stage-head { padding-left: 58px; }
+
+.pogo-gen .pg-receipt-head { position: relative; }
+.pogo-gen .pg-receipt-head::after {
+    content: '✦';
+    position: absolute; top: -12px; right: 2px;
+    color: var(--premium-gold); font-size: 30px; line-height: 1;
+    text-shadow: 0 0 0 var(--premium-ink), 1px 1px 0 var(--premium-ink);
+    -webkit-text-stroke: 1.5px var(--premium-ink);
+    pointer-events: none;
+    animation: pg-spark-tw 2.4s ease-in-out infinite;
+}
+
+/* Primary CTAs get the video's gold-pill confidence */
+.pogo-gen .pg-btn-gold,
+.pogo-gen .place-order-btn {
+    background: var(--premium-gold);
+    color: var(--premium-ink);
+    text-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pogo-gen .pg-stage-head::after,
+    .pogo-gen .pg-receipt-head::after { animation: none !important; }
+}

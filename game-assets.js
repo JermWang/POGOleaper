@@ -85,7 +85,7 @@ class GameAssets {
     // Helper function to get biome name for debugging
     getBiomeName(height) {
         const absHeight = Math.abs(height);
-        if (absHeight < 2000) return 'Restaurant Grounds';
+        if (absHeight < 2000) return 'Lily Pad Pond';
         else if (absHeight < 8000) return 'Elite City Heights';
         else if (absHeight < 20000) return 'Legendary Cloud Nine';
         else if (absHeight < 40000) return 'Mythic Stratosphere';

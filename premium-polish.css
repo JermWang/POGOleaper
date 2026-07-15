@@ -197,10 +197,11 @@ body {
 
 .pogo-gen .pg-stage {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-columns: minmax(0, 760px) minmax(260px, 300px);
     gap: 24px;
     position: static;
     align-items: stretch;
+    justify-content: center;
 }
 
 .pogo-gen .pg-stage-card {
@@ -227,7 +228,9 @@ body {
 
 .pogo-gen .pg-canvas-wrap {
     min-height: 0;
-    height: min(41vw, 390px);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
     border: var(--premium-border);
     border-radius: 16px;
     background: var(--premium-lime-soft) url('bg 2048.png') center 56% / cover no-repeat;
@@ -237,13 +240,26 @@ body {
 
 .pogo-gen .pg-canvas-wrap canvas {
     width: 100% !important;
-    height: 390px !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1;
     max-width: none !important;
     max-height: none !important;
     object-fit: contain;
     background: transparent !important;
     transform: none !important;
     box-shadow: none !important;
+}
+
+/* Override legacy ID-based mobile sizing so the bitmap always fills the new
+   square stage instead of becoming a smaller square inside it. */
+#generator-panel .pogo-gen .pg-canvas-wrap #pfpCanvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 1 / 1;
+    margin: 0 !important;
+    object-fit: contain;
 }
 
 .pogo-gen .pg-log-strip {
@@ -521,7 +537,8 @@ body {
     }
 
     .pogo-gen .pg-stage {
-        grid-template-columns: minmax(0, 1fr) 250px;
+        grid-template-columns: minmax(0, 720px) 250px;
+        justify-content: center;
     }
 
     .pogo-gen .pg-combos {
@@ -623,12 +640,13 @@ body {
     .pogo-gen .pg-canvas-wrap {
         min-height: 0;
         height: auto;
-        aspect-ratio: 1.24 / 1;
+        aspect-ratio: 1 / 1;
     }
 
     .pogo-gen .pg-canvas-wrap canvas {
         width: 100% !important;
-        height: calc((100vw - 50px) / 1.24) !important;
+        height: 100% !important;
+        aspect-ratio: 1 / 1;
         object-fit: contain;
         transform: none !important;
     }
@@ -1106,4 +1124,223 @@ body {
         font-size: 0.74rem;
         line-height: 1.4;
     }
+}
+
+/* ============================================================
+   FINAL POLISH PASS — motion, depth & pond delight
+   Layered on top of the premium pond system. Additive only;
+   every bit of motion is gated behind prefers-reduced-motion.
+   ============================================================ */
+:root {
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-out: cubic-bezier(0.22, 0.8, 0.28, 1);
+}
+
+/* --- Keyframes --- */
+@keyframes pg-pop-in {
+    0%   { opacity: 0; transform: translateY(18px) scale(0.975); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pg-panel-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pg-select-pop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.11) rotate(-2deg); }
+    100% { transform: scale(1); }
+}
+@keyframes pg-badge-pop {
+    0%   { transform: scale(0) rotate(-40deg); }
+    60%  { transform: scale(1.25) rotate(8deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+@keyframes pg-slide-in {
+    from { opacity: 0; transform: translateX(12px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pg-stat-pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.28); color: var(--premium-green); }
+    100% { transform: scale(1); }
+}
+@keyframes pg-load-hop {
+    0%, 100% { transform: translateY(0) scale(1, 1); }
+    28%      { transform: translateY(-22px) scale(0.94, 1.08); }
+    50%      { transform: translateY(0) scale(1.06, 0.94); }
+    64%      { transform: translateY(-6px) scale(1, 1); }
+}
+@keyframes pg-active-glow {
+    0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), 0 0 0 rgba(255,197,47,0); }
+    50%      { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), 0 0 16px rgba(255,197,47,0.55); }
+}
+@keyframes pg-spin-once {
+    0%   { transform: rotate(0) scale(1); }
+    35%  { transform: rotate(-8deg) scale(1.03); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+@keyframes pond-rise {
+    0%   { transform: translateY(0) translateX(0); }
+    100% { transform: translateY(-112vh) translateX(var(--sway, 0px)); }
+}
+@keyframes pg-hop {
+    0%, 100% { transform: rotate(0) translateY(0); }
+    30%      { transform: rotate(-10deg) translateY(-8px) scale(1.06); }
+    60%      { transform: rotate(6deg) translateY(0); }
+}
+
+/* --- Typography polish --- */
+.pogo-gen .pg-title,
+#game-panel .game-title-section h2,
+#game-panel .game-command-copy h3 { text-wrap: balance; }
+.pogo-gen .pg-title { transition: text-shadow 0.25s ease; }
+
+/* --- Pond ambiance (drifting spores injected by pogo-polish.js) --- */
+.pond-ambiance {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+}
+.restaurant-container { position: relative; z-index: 2; }
+
+/* --- Panel enter transition --- */
+.tab-panel.active {
+    animation: pg-panel-in 0.45s var(--ease-out) both;
+}
+
+/* --- Generator card entrances (staggered) --- */
+.pogo-gen .pg-stage > .pg-card,
+.pogo-gen .pg-picker > .pg-card {
+    animation: pg-pop-in 0.5s var(--ease-out) both;
+}
+.pogo-gen .pg-stage .pg-stage-card { animation-delay: 0.04s; }
+.pogo-gen .pg-stage .pg-receipt    { animation-delay: 0.12s; }
+.pogo-gen .pg-picker > *:nth-child(1) { animation-delay: 0.10s; }
+.pogo-gen .pg-picker > *:nth-child(2) { animation-delay: 0.17s; }
+.pogo-gen .pg-picker > *:nth-child(3) { animation-delay: 0.24s; }
+.pogo-gen .pg-picker > *:nth-child(4) { animation-delay: 0.31s; }
+
+/* --- Header logo + brand --- */
+.header-logo {
+    transition: transform 0.3s var(--ease-spring), border-color 0.2s ease;
+    cursor: pointer;
+}
+.header-logo:hover { transform: rotate(-8deg) scale(1.08); border-color: #fff; }
+.header-logo.pg-hop { animation: pg-hop 0.5s var(--ease-spring); }
+
+/* --- Header nav micro-interactions --- */
+.header-app-nav .tab-button {
+    transition: transform 0.2s var(--ease-spring), background 0.18s ease,
+                border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+.header-app-nav .tab-button:hover { transform: translateY(-2px) scale(1.015); }
+.header-app-nav .tab-button:active { transform: translateY(0) scale(0.98); }
+.header-app-nav .tab-icon { transition: transform 0.28s var(--ease-spring); }
+.header-app-nav .tab-button:hover .tab-icon { transform: translateY(-2px) rotate(-7deg) scale(1.1); }
+.header-app-nav .tab-button.active { animation: pg-active-glow 3.2s ease-in-out infinite; }
+.header-app-nav .tab-button:focus-visible,
+.pogo-gen .pg-btn:focus-visible,
+#game-panel .game-btn:focus-visible,
+#game-panel .game-start-button:focus-visible {
+    outline: 3px solid var(--premium-gold);
+    outline-offset: 3px;
+}
+
+/* --- Trait chips: springy hover, press, selected pop + badge --- */
+.pogo-gen .menu-item {
+    transition: transform 0.18s var(--ease-spring), background 0.15s ease,
+                box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.pogo-gen .menu-item:hover { transform: translateY(-3px) scale(1.035); }
+.pogo-gen .menu-item:active { transform: translateY(0) scale(0.96); }
+.pogo-gen .menu-item .item-image { transition: transform 0.22s var(--ease-spring); }
+.pogo-gen .menu-item:hover .item-image { transform: scale(1.08) rotate(-3deg); }
+.pogo-gen .menu-item.selected { animation: pg-select-pop 0.42s var(--ease-spring); }
+.pogo-gen .menu-item.selected::after {
+    content: '✓';
+    display: grid;
+    place-items: center;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 3;
+    width: 22px;
+    height: 22px;
+    color: var(--premium-ink);
+    background: var(--premium-gold);
+    border: 2px solid var(--premium-ink);
+    border-radius: 50%;
+    box-shadow: 0 2px 0 rgba(22,33,15,0.6);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    animation: pg-badge-pop 0.4s var(--ease-spring);
+}
+
+/* --- Selected-look trait rows pop in when the look changes --- */
+.selected-trait { animation: pg-slide-in 0.35s var(--ease-out) both; }
+
+/* --- Buttons: consistent spring press across the site --- */
+.pogo-gen .pg-btn,
+.pogo-gen .pg-combo,
+#game-panel .game-btn,
+#game-panel .game-start-button {
+    transition: transform 0.14s var(--ease-spring), box-shadow 0.14s ease, background 0.14s ease;
+}
+.pogo-gen .pg-btn:hover,
+#game-panel .game-btn:hover { transform: translateY(-2px); }
+.pogo-gen .pg-btn:active,
+.pogo-gen .pg-combo:active,
+#game-panel .game-btn:active,
+#game-panel .game-start-button:active {
+    transform: translateY(3px) scale(0.99);
+    box-shadow: 0 1px 0 var(--premium-ink);
+}
+.pogo-gen .pg-combo:hover { transform: translateY(-2px) rotate(-1.5deg); }
+.pogo-gen .pg-combo-wild:hover { transform: translateY(-2px) rotate(2deg) scale(1.03); }
+.pogo-gen .pg-stage-card.pg-spin { animation: pg-spin-once 0.7s var(--ease-out); }
+
+/* --- Social + contract chips --- */
+.pogo-gen .pg-social { transition: transform 0.16s var(--ease-spring), background 0.16s ease; }
+.pogo-gen .pg-social:hover { transform: translateY(-3px) rotate(-6deg) scale(1.08); background: var(--premium-lime); }
+.pogo-gen .pg-social:active { transform: translateY(1px) scale(0.95); }
+.pogo-gen .pg-contract { transition: transform 0.14s var(--ease-spring), box-shadow 0.14s ease; }
+.pogo-gen .pg-contract:hover { transform: translateY(-2px); }
+
+/* --- Game stat pop on change --- */
+#game-panel .stat-value { display: inline-block; transition: color 0.3s ease; }
+#game-panel .stat-value.pg-pop { animation: pg-stat-pop 0.5s var(--ease-spring); }
+#game-panel .stat-box { transition: transform 0.18s var(--ease-spring), box-shadow 0.18s ease; }
+#game-panel .stat-box:hover { transform: translateY(-2px); }
+
+/* Start button draws a gentle breathing pulse before play */
+#game-panel .game-btn.primary,
+#game-panel .game-start-button {
+    animation: pg-active-glow 2.8s ease-in-out infinite;
+}
+
+/* --- Loading screen: give Pogo a real leap --- */
+.loading-frog { animation: pg-load-hop 1.1s var(--ease-spring) infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+    .tab-panel.active,
+    .pogo-gen .pg-stage > .pg-card,
+    .pogo-gen .pg-picker > .pg-card,
+    .pogo-gen .menu-item.selected,
+    .pogo-gen .menu-item.selected::after,
+    .selected-trait,
+    .header-app-nav .tab-button.active,
+    #game-panel .game-btn.primary,
+    #game-panel .game-start-button,
+    #game-panel .stat-value.pg-pop,
+    .loading-frog,
+    .header-logo.pg-hop,
+    .pogo-gen .pg-stage-card.pg-spin {
+        animation: none !important;
+    }
+    .pond-ambiance { display: none !important; }
 }
